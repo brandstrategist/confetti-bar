@@ -1,0 +1,1938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CONFETTI BAR™ by SAINT IVY</title>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500&family=Raleway:wght@400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #FFFFFF;
+    --text: #000000;
+    --muted: #666666;
+    --border: #E0E0E0;
+    --card-bg: #FFFFFF;
+    --accent: #000000;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 20px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+  .header h1 {
+    font-family: 'Raleway', sans-serif;
+    font-size: 42px;
+    font-weight: 600;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+  }
+  .header h1 sup {
+    font-size: 14px;
+    vertical-align: super;
+    letter-spacing: 0;
+  }
+  .header .byline {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 2px;
+  }
+  .header-center {
+    text-align: center;
+  }
+
+  /* LAYOUT */
+  .app-layout {
+    display: flex;
+    min-height: calc(100vh - 100px);
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 280px;
+    min-width: 280px;
+    background: var(--card-bg);
+    border-right: 1px solid var(--border);
+    padding: 24px 20px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  .sidebar h2 {
+    font-family: 'Raleway', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .sidebar .subtitle {
+    font-family: 'Lora', serif;
+    font-size: 14px;
+    color: var(--muted);
+    letter-spacing: 0;
+    text-transform: none;
+    margin-bottom: 16px;
+  }
+
+  /* COLOR PICKER */
+  .color-slots {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .color-slot {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 10px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .color-slot:hover { border-color: var(--muted); }
+  .color-swatch {
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .color-hex {
+    font-size: 12px;
+    font-family: 'Inter', monospace;
+    color: var(--text);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    width: 65px;
+    border: none;
+    background: transparent;
+    outline: none;
+    cursor: pointer;
+  }
+  .color-hex:focus { color: var(--accent); }
+
+  /* PRESET PALETTES */
+  .presets-label {
+    font-family: 'Lora', serif;
+    font-size: 14px;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .preset-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 0;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border);
+    transition: opacity 0.2s;
+  }
+  .preset-row:hover { opacity: 0.7; }
+  .preset-row:last-child { border-bottom: none; }
+  .preset-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.08);
+  }
+  .preset-name {
+    font-size: 13px;
+    margin-left: 4px;
+    color: var(--text);
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 20px 0;
+  }
+
+  /* SHAPE SELECTOR */
+  .shape-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .shape-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .shape-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 100%;
+    height: 64px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: transparent;
+    font-family: 'Inter', sans-serif;
+  }
+  .shape-option:hover { border-color: var(--muted); }
+  .shape-option.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .shape-option .shape-icon { font-size: 20px; line-height: 1; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+  .shape-option.active .shape-icon { filter: brightness(10); }
+  .shape-option .shape-label { font-size: 10px; letter-spacing: 0.5px; text-transform: uppercase; }
+
+  /* EMOJI MIXER */
+  .emoji-search-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+    margin-bottom: 10px;
+  }
+  .emoji-search-input::placeholder { color: #AAAAAA; }
+  .emoji-search-input:focus { border-color: var(--muted); }
+  .emoji-results {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 4px;
+    max-height: 150px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+  }
+  .emoji-option {
+    font-size: 20px;
+    text-align: center;
+    padding: 6px 0;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.15s;
+  }
+  .emoji-option:hover { background: var(--bg); }
+  .emoji-selected-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 10px;
+  }
+  .emoji-selected-bar .selected-emoji { font-size: 24px; }
+  .emoji-selected-bar .clear-btn {
+    font-size: 14px;
+    color: var(--muted);
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    transition: color 0.2s;
+  }
+  .emoji-selected-bar .clear-btn:hover { color: var(--text); }
+  .show-all-emoji-btn {
+    font-family: 'Lora', serif;
+    font-size: 13px;
+    color: var(--muted);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 4px 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .show-all-emoji-btn:hover { border-color: var(--muted); color: var(--text); }
+  .show-all-emoji-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  /* CATEGORY FILTER */
+  .category-label {
+    font-family: 'Lora', serif;
+    font-size: 14px;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .category-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .cat-pill {
+    font-size: 12px;
+    padding: 5px 12px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Inter', sans-serif;
+  }
+  .cat-pill:hover, .cat-pill.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+
+  /* MAIN CONTENT */
+  .main {
+    flex: 1;
+    padding: 30px;
+  }
+
+  .effects-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+  }
+
+  .effect-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    position: relative;
+    min-height: 90px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .effect-card:hover {
+    border-color: var(--muted);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  }
+  .effect-card .name {
+    font-family: 'Raleway', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .effect-card .desc {
+    font-family: 'Lora', serif;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* COPY CODE BUTTON */
+  .copy-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+    font-family: 'Inter', sans-serif;
+  }
+  .effect-card:hover .copy-btn { opacity: 1; }
+  .copy-btn:hover { background: var(--accent); color: #fff; }
+  .effect-card.selected {
+    border-color: var(--accent);
+    background: rgba(0,0,0,0.04);
+    box-shadow: 0 0 0 2px var(--accent), 0 4px 20px rgba(0,0,0,0.10);
+  }
+  .effect-card.selected .name {
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .effect-card.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 20px;
+    height: 20px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 50%;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+  }
+
+  /* PLAY SELECTED BAR */
+  .play-bar {
+    position: fixed;
+    bottom: 0;
+    left: 280px;
+    right: 0;
+    background: var(--card-bg);
+    border-top: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 100;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+  }
+  .play-bar.visible { transform: translateY(0); }
+  .play-bar .selected-info {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+  .play-bar .selected-names {
+    font-family: 'Lora', serif;
+    font-size: 15px;
+    color: var(--text);
+    margin-top: 2px;
+  }
+  .play-bar button {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 10px 24px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--bg);
+    color: var(--text);
+  }
+  .play-bar .play-btn { background: var(--accent); color: #fff; border-color: var(--accent); margin-left: 8px; }
+  .play-bar .play-btn:hover { opacity: 0.9; }
+  .play-bar .clear-btn:hover { border-color: var(--muted); }
+
+  /* EMPTY COLOR SLOT */
+  .color-slot.empty {
+    border-style: dashed;
+    border-color: #CCC;
+  }
+  .color-swatch.empty-swatch {
+    background: transparent !important;
+    border: 2px dashed #CCC;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: #CCC;
+    line-height: 1;
+  }
+  .color-hex.empty-hex {
+    color: #CCC !important;
+    font-style: italic;
+  }
+
+  /* COLOR ASSIGNMENT for shapes */
+  .shape-color-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 5px;
+    cursor: pointer;
+  }
+  .shape-color-swatch {
+    width: 18px;
+    height: 18px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .shape-color-swatch.empty {
+    border: 1.5px dashed #CCC;
+    background: transparent;
+  }
+  .shape-color-hex {
+    font-size: 10px;
+    font-family: 'Inter', monospace;
+    color: var(--muted);
+    letter-spacing: 0.3px;
+  }
+
+  /* HIDDEN native color input */
+  .hidden-picker { position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none; }
+
+  /* CUSTOM HEX COLOR PICKER */
+  .cpicker-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+  }
+  .cpicker-overlay.visible { display: block; }
+  .cpicker {
+    position: absolute;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    z-index: 1000;
+    width: 240px;
+  }
+  .cpicker-gradient {
+    width: 100%;
+    height: 140px;
+    border-radius: 6px;
+    cursor: crosshair;
+    position: relative;
+    margin-bottom: 10px;
+    border: 1px solid var(--border);
+  }
+  .cpicker-gradient canvas {
+    width: 100%;
+    height: 100%;
+    border-radius: 5px;
+    display: block;
+  }
+  .cpicker-cursor {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.3), inset 0 0 0 1px rgba(0,0,0,0.2);
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+  }
+  .cpicker-hue-wrap {
+    position: relative;
+    width: 100%;
+    height: 16px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid var(--border);
+  }
+  .cpicker-hue-wrap canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .cpicker-hue-thumb {
+    position: absolute;
+    top: -1px;
+    width: 6px;
+    height: 18px;
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.3);
+    border-radius: 3px;
+    pointer-events: none;
+    transform: translateX(-50%);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .cpicker-bottom {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cpicker-swatch {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .cpicker-hex-input {
+    flex: 1;
+    padding: 9px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: 'Inter', monospace;
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text);
+    background: var(--bg);
+    outline: none;
+    text-align: center;
+  }
+  .cpicker-hex-input:focus { border-color: var(--accent); }
+  .cpicker-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .cpicker-actions button {
+    flex: 1;
+    padding: 8px;
+    border-radius: 5px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    transition: all 0.15s;
+  }
+  .cpicker-actions .cpicker-save {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .cpicker-actions button:hover { opacity: 0.85; }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .app-layout { flex-direction: column; }
+    .sidebar {
+      width: 100%;
+      min-width: 100%;
+      position: relative;
+      height: auto;
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+    }
+    .color-slots { grid-template-columns: repeat(3, 1fr); }
+    .effects-grid { grid-template-columns: repeat(2, 1fr); }
+    .header { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<input type="color" class="hidden-picker" id="hiddenPicker">
+
+<!-- CUSTOM HEX COLOR PICKER -->
+<div class="cpicker-overlay" id="cpickerOverlay">
+  <div class="cpicker" id="cpicker">
+    <div class="cpicker-gradient" id="cpickerGradient">
+      <canvas id="cpickerGradientCanvas"></canvas>
+      <div class="cpicker-cursor" id="cpickerCursor"></div>
+    </div>
+    <div class="cpicker-hue-wrap" id="cpickerHueWrap">
+      <canvas id="cpickerHueCanvas"></canvas>
+      <div class="cpicker-hue-thumb" id="cpickerHueThumb"></div>
+    </div>
+    <div class="cpicker-bottom">
+      <div class="cpicker-swatch" id="cpickerSwatch"></div>
+      <input class="cpicker-hex-input" id="cpickerHexInput" maxlength="7" placeholder="#000000" spellcheck="false">
+    </div>
+    <div class="cpicker-actions">
+      <button onclick="cpickerClose()">Cancel</button>
+      <button class="cpicker-save" onclick="cpickerSave()">Apply</button>
+    </div>
+  </div>
+</div>
+
+<div class="header">
+  <div class="header-center">
+    <h1>CONFETTI BAR<sup>TM</sup></h1>
+    <div class="byline">by SAINT IVY</div>
+  </div>
+</div>
+
+<div class="app-layout">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <h2>Palette Mixer</h2>
+    <p class="subtitle">Tap to add a color<br>Right-click to clear</p>
+    <div class="color-slots" id="colorSlots"></div>
+
+    <div class="presets-label">Quick palettes</div>
+    <div id="presetList"></div>
+
+    <div class="divider"></div>
+
+    <h2>Confetti Mixer</h2>
+    <p class="subtitle">Choose a shape for your confetti</p>
+
+    <div class="shape-grid" id="shapeGrid"></div>
+
+    <div class="divider"></div>
+
+    <h2>Emoji Mixer</h2>
+    <input type="text" class="emoji-search-input" id="emojiSearchInput" placeholder="Search emojis...">
+    <div style="margin-bottom:8px;"><button class="show-all-emoji-btn" id="showAllEmojiBtn">Show All</button></div>
+    <div class="emoji-results" id="emojiResults"></div>
+    <div class="emoji-selected-bar" id="emojiSelectedBar" style="display:none;">
+      <span class="selected-emoji" id="selectedEmojiDisplay"></span>
+      <button class="clear-btn" id="clearEmojiBtn">&times; Clear</button>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="category-label">Filter by Category</div>
+    <div class="category-pills" id="categoryPills"></div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="effects-grid" id="effectsGrid"></div>
+  </div>
+</div>
+
+<!-- PLAY SELECTED BAR -->
+<div class="play-bar" id="playBar">
+  <div>
+    <div class="selected-info">SELECTED EFFECTS (<span id="selectedCount">0</span>/4)</div>
+    <div class="selected-names" id="selectedNames"></div>
+  </div>
+  <div>
+    <button class="clear-btn" onclick="clearSelectedEffects()">Clear</button>
+    <button class="play-btn" onclick="playSelectedEffects()">Play All</button>
+  </div>
+</div>
+
+<script>
+// =============================================
+// COLOR STATE - defaults to Ocean palette
+// =============================================
+let colors = ['#006D77','#83C5BE','#EDF6F9','#FFDDD2','#E29578','#FFFFFF'];
+
+// Hidden Saint Ivy colors for welcome burst ONLY
+const welcomeColors = ['#000000', '#333333', '#666666', '#999999', '#CCCCCC', '#FFFFFF'];
+
+const presets = [
+  { name: 'Fireworks', colors: ['#BF0A30','#002868','#FFFFFF','#BF0A30','#002868','#FFFFFF'] },
+  { name: 'Amber',     colors: ['#C9A96E','#D4B483','#8C7A6B','#FAF7F2','#5C4A3A','#7A8B6F'] },
+  { name: 'Blush',     colors: ['#E8B4B8','#D4919A','#F5E1E0','#FFFFFF','#C77D85','#F0D0CF'] },
+  { name: 'Midnight',  colors: ['#1A1A2E','#16213E','#0F3460','#E94560','#533483','#FFFFFF'] },
+  { name: 'Sage',      colors: ['#8B9A77','#B5C4A1','#D4C9A8','#F5F0E8','#6B7A5E','#FFFFFF'] },
+  { name: 'Noir',      colors: ['#000000','#1A1A1A','#333333','#666666','#999999','#FFFFFF'] },
+  { name: 'Sunset',    colors: ['#FF6B35','#F7931E','#FFD166','#FF4E50','#FC913A','#FCEABB'] },
+  { name: 'Ocean',     colors: ['#006D77','#83C5BE','#EDF6F9','#FFDDD2','#E29578','#FFFFFF'] },
+  { name: 'Holiday',   colors: ['#800020','#046A38','#8FBC8F','#FFFFF0','#800020','#046A38'] },
+];
+
+// =============================================
+// SHAPE SELECTOR (multi-select)
+// =============================================
+let selectedShapes = new Set(); // default: none selected (uses circle fallback)
+
+// Color assignment per shape: { shapeId: '#hexcolor' or null }
+// null means "use all palette colors" (default)
+let shapeColorAssignments = {};
+
+const shapeOptions = [
+  { id: 'circle',  label: 'Circle',  icon: '●', iconSize: '18px' },
+  { id: 'heart',   label: 'Heart',   icon: '♥', iconSize: '18px' },
+  { id: 'star',    label: 'Star',    icon: '★', iconSize: '18px' },
+  { id: 'square',  label: 'Square',  icon: '■', iconSize: '18px' },
+  { id: 'diamond', label: 'Diamond', icon: '◆', iconSize: '18px' },
+  { id: 'squiggle',label: 'Squiggle',icon: '〰', iconSize: '18px' },
+];
+
+// Build custom confetti shapes using shapeFromText (more reliable than shapeFromPath)
+let customShapes = {};
+
+function buildCustomShapes() {
+  // ALL paths use ~300-unit coordinate space so they render at the SAME size as each other
+  // Heart — ~334x299 coordinate range
+  try {
+    customShapes.heart = confetti.shapeFromPath({
+      path: 'M167 72c19,-38 37,-56 75,-56 42,0 76,33 76,75 0,76 -76,151 -151,227 -76,-76 -151,-151 -151,-227 0,-42 33,-75 76,-75 37,0 56,19 75,56z'
+    });
+  } catch(e) { customShapes.heart = 'circle'; }
+  // Star — 5-pointed, scaled to ~300x294 coordinate range (matches heart)
+  try {
+    customShapes.star = confetti.shapeFromPath({
+      path: 'M150,0 L189,114 L300,114 L210,180 L246,294 L150,225 L54,294 L90,180 L0,114 L111,114 Z'
+    });
+  } catch(e) { customShapes.star = 'circle'; }
+  // Diamond — rhombus, scaled to 300x300 coordinate range (matches heart)
+  try {
+    customShapes.diamond = confetti.shapeFromPath({
+      path: 'M150,0 L300,150 L150,300 L0,150 Z'
+    });
+  } catch(e) { customShapes.diamond = 'square'; }
+  // Squiggle/Wave — closed thick wave path so it renders visibly large, ~300-unit coordinate space
+  try {
+    customShapes.squiggle = confetti.shapeFromPath({
+      path: 'M0,160 C40,40 100,280 150,160 C200,40 260,280 300,160 L300,190 C260,310 200,70 150,190 C100,310 40,70 0,190 Z'
+    });
+  } catch(e) { customShapes.squiggle = 'circle'; }
+}
+
+function getActiveShapes() {
+  const shapes = [];
+  if (selectedShapes.has('circle')) shapes.push('circle');
+  if (selectedShapes.has('square')) shapes.push('square');
+  if (selectedShapes.has('heart')) shapes.push(customShapes.heart || 'circle');
+  if (selectedShapes.has('star')) shapes.push(customShapes.star || 'circle');
+  if (selectedShapes.has('diamond')) shapes.push(customShapes.diamond || 'square');
+  if (selectedShapes.has('squiggle')) shapes.push(customShapes.squiggle || 'circle');
+  return shapes.length > 0 ? shapes : ['circle'];
+}
+
+function renderShapeGrid() {
+  const container = document.getElementById('shapeGrid');
+  container.innerHTML = '';
+  const activeColors = colors.filter(c => c !== null);
+
+  shapeOptions.forEach(s => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'shape-wrapper';
+
+    const btn = document.createElement('button');
+    btn.className = 'shape-option' + (selectedShapes.has(s.id) ? ' active' : '');
+    btn.innerHTML = `<span class="shape-icon" style="font-size:${s.iconSize}">${s.icon}</span><span class="shape-label">${s.label}</span>`;
+    btn.addEventListener('click', () => {
+      if (selectedShapes.has(s.id)) {
+        if (selectedShapes.size > 1) {
+          selectedShapes.delete(s.id);
+          delete shapeColorAssignments[s.id];
+        }
+      } else {
+        selectedShapes.add(s.id);
+      }
+      renderShapeGrid();
+    });
+    wrapper.appendChild(btn);
+
+    // Color assignment swatch + hex — only show if shape is selected
+    if (selectedShapes.has(s.id)) {
+      const colorRow = document.createElement('div');
+      colorRow.className = 'shape-color-row';
+
+      const swatch = document.createElement('div');
+      swatch.className = 'shape-color-swatch' + (shapeColorAssignments[s.id] ? '' : ' empty');
+      if (shapeColorAssignments[s.id]) {
+        swatch.style.background = shapeColorAssignments[s.id];
+      }
+
+      const hex = document.createElement('div');
+      hex.className = 'shape-color-hex';
+      hex.textContent = shapeColorAssignments[s.id] ? shapeColorAssignments[s.id] : 'all colors';
+
+      colorRow.appendChild(swatch);
+      colorRow.appendChild(hex);
+      colorRow.addEventListener('click', (e) => {
+        e.stopPropagation();
+        cpickerOpenForShape(s.id, colorRow);
+      });
+
+      wrapper.appendChild(colorRow);
+    }
+
+    container.appendChild(wrapper);
+  });
+}
+
+// Shimmer effect removed
+
+// =============================================
+// EMOJI MIXER
+// =============================================
+let selectedEmoji = null;
+
+const emojiData = [
+  // DRINKS & CELEBRATION
+  { e:'🍸', kw:['martini','drink','cocktail','glass','olive'] },
+  { e:'🥂', kw:['champagne','toast','cheers','celebration','drink'] },
+  { e:'🍾', kw:['bottle','champagne','pop','celebrate'] },
+  { e:'🥃', kw:['whiskey','drink','glass','bourbon'] },
+  { e:'🍷', kw:['wine','drink','glass','red','white'] },
+  { e:'🍹', kw:['tropical','cocktail','drink','margarita'] },
+  { e:'🍺', kw:['beer','drink','mug','ale','pub'] },
+  { e:'🧋', kw:['boba','tea','bubble','drink'] },
+  { e:'☕', kw:['coffee','tea','drink','morning','cafe','hot'] },
+  { e:'🧃', kw:['juice','box','drink','kid'] },
+
+  // MONEY & LUXURY
+  { e:'💰', kw:['money','cash','bag','wealth','rich'] },
+  { e:'💵', kw:['dollar','money','cash','bill'] },
+  { e:'💎', kw:['diamond','gem','luxury','precious','jewel'] },
+  { e:'👑', kw:['crown','king','queen','royalty','royal'] },
+  { e:'🏆', kw:['trophy','award','winner','victory','champion'] },
+  { e:'🪙', kw:['coin','money','gold','token'] },
+  { e:'💳', kw:['card','credit','payment','buy'] },
+  { e:'💲', kw:['dollar','money','sign','price'] },
+
+  // SPARKLE & ENERGY
+  { e:'✨', kw:['sparkle','shine','magic','glitter','star'] },
+  { e:'🔥', kw:['fire','hot','flame','energy','lit'] },
+  { e:'⭐', kw:['star','bright','shine','favorite'] },
+  { e:'💫', kw:['dizzy','star','sparkle','shooting'] },
+  { e:'🌟', kw:['star','glow','bright','shine'] },
+  { e:'❤️‍🔥', kw:['burning','passion','love','fire','heart'] },
+  { e:'💪', kw:['strong','muscle','power','flex','strength'] },
+  { e:'⚡', kw:['lightning','bolt','power','energy','electric','zap'] },
+  { e:'💥', kw:['boom','explosion','bang','collision','pow'] },
+  { e:'🌈', kw:['rainbow','colorful','pride','arc'] },
+
+  // PARTY & CELEBRATION
+  { e:'🎉', kw:['party','celebrate','confetti','birthday','popper'] },
+  { e:'🎊', kw:['celebration','party','confetti','festive'] },
+  { e:'🥳', kw:['party','celebrate','birthday','fun','hat'] },
+  { e:'🎆', kw:['fireworks','celebration','sparkle'] },
+  { e:'🎇', kw:['sparkler','fireworks','celebration'] },
+  { e:'🪩', kw:['disco','ball','party','dance','mirror'] },
+  { e:'🎈', kw:['balloon','party','birthday','celebrate','red'] },
+  { e:'🎁', kw:['gift','present','birthday','christmas','box','wrapped'] },
+  { e:'🎀', kw:['ribbon','bow','gift','pink','present'] },
+  { e:'🎂', kw:['cake','birthday','candle','dessert','celebrate'] },
+  { e:'🧁', kw:['cupcake','dessert','sweet','birthday','treat'] },
+  { e:'🍰', kw:['cake','slice','dessert','sweet','shortcake'] },
+
+  // NATURE & FLOWERS
+  { e:'🌹', kw:['rose','flower','love','beauty','red'] },
+  { e:'🌿', kw:['leaf','nature','green','herb','plant'] },
+  { e:'🍃', kw:['leaves','nature','green','wind'] },
+  { e:'🌸', kw:['flower','bloom','spring','pink','cherry','blossom'] },
+  { e:'🌺', kw:['hibiscus','flower','tropical','beauty'] },
+  { e:'🌻', kw:['sunflower','flower','yellow','sun','garden'] },
+  { e:'🌷', kw:['tulip','flower','spring','pink','garden'] },
+  { e:'🪻', kw:['lavender','flower','purple','garden','calm'] },
+  { e:'🍀', kw:['clover','luck','lucky','irish','green','shamrock'] },
+  { e:'🌴', kw:['palm','tree','tropical','beach','vacation'] },
+  { e:'🌊', kw:['wave','ocean','sea','water','beach','surf'] },
+  { e:'☀️', kw:['sun','sunny','bright','weather','day','summer'] },
+  { e:'🌙', kw:['moon','night','crescent','lunar','sleep'] },
+  { e:'⛅', kw:['cloud','weather','sun','partly'] },
+  { e:'❄️', kw:['snowflake','winter','cold','snow','ice','frozen'] },
+
+  // ANIMALS
+  { e:'🦋', kw:['butterfly','transform','flutter','freedom','nature'] },
+  { e:'🐝', kw:['bee','honey','buzz','insect','nature'] },
+  { e:'🕊️', kw:['dove','peace','bird','white','freedom'] },
+  { e:'🦄', kw:['unicorn','magic','fantasy','rainbow','horse'] },
+  { e:'🐾', kw:['paw','pet','dog','cat','animal','print'] },
+  { e:'🦅', kw:['eagle','bird','fly','america','freedom'] },
+  { e:'🐻', kw:['bear','animal','teddy','cute'] },
+  { e:'🐶', kw:['dog','puppy','pet','cute','animal'] },
+  { e:'🐱', kw:['cat','kitten','pet','cute','animal'] },
+
+  // BUSINESS & SUCCESS
+  { e:'📈', kw:['chart','growth','up','success','business','stock'] },
+  { e:'🎯', kw:['target','goal','aim','bullseye','hit'] },
+  { e:'🏅', kw:['medal','award','achievement','gold'] },
+  { e:'💼', kw:['briefcase','business','work','professional'] },
+  { e:'🔑', kw:['key','unlock','solution','access','secret'] },
+  { e:'📊', kw:['chart','bar','graph','data','business','analytics'] },
+  { e:'🚀', kw:['rocket','launch','startup','fast','space','fly'] },
+  { e:'💡', kw:['lightbulb','idea','bright','creative','think'] },
+  { e:'📱', kw:['phone','mobile','cell','smartphone','tech'] },
+  { e:'💻', kw:['laptop','computer','tech','work','code'] },
+
+  // HEARTS
+  { e:'❤️', kw:['heart','love','red'] },
+  { e:'🖤', kw:['heart','black','dark','love'] },
+  { e:'🤍', kw:['heart','white','pure','love'] },
+  { e:'💛', kw:['heart','yellow','gold'] },
+  { e:'💚', kw:['heart','green','nature'] },
+  { e:'💜', kw:['heart','purple','luxury'] },
+  { e:'🩷', kw:['heart','pink','love'] },
+  { e:'💙', kw:['heart','blue','ocean','sky'] },
+  { e:'🧡', kw:['heart','orange','warm'] },
+  { e:'🩵', kw:['heart','light','blue','baby'] },
+  { e:'💗', kw:['heart','growing','love','pink'] },
+  { e:'💖', kw:['heart','sparkle','love','pink'] },
+  { e:'💝', kw:['heart','ribbon','gift','love','valentine'] },
+
+  // FASHION & BEAUTY
+  { e:'👠', kw:['shoe','heel','fashion','style','glamour'] },
+  { e:'💄', kw:['lipstick','makeup','beauty','cosmetics'] },
+  { e:'👜', kw:['purse','bag','handbag','fashion','luxury'] },
+  { e:'🕶️', kw:['sunglasses','cool','shades','style'] },
+  { e:'💍', kw:['ring','jewelry','diamond','engagement','luxury','wedding'] },
+  { e:'👗', kw:['dress','fashion','style','glamour','elegant'] },
+  { e:'👒', kw:['hat','sun','fashion','style','summer'] },
+  { e:'💅', kw:['nails','polish','manicure','beauty','fashion'] },
+  { e:'👸', kw:['princess','crown','royal','queen','girl'] },
+
+  // HOME & OBJECTS
+  { e:'🏠', kw:['home','house','building','family','property'] },
+  { e:'🏡', kw:['home','house','garden','property','yard'] },
+  { e:'🏢', kw:['office','building','business','work','corporate'] },
+  { e:'🏰', kw:['castle','palace','royal','fairytale','princess'] },
+  { e:'🛋️', kw:['couch','sofa','home','living','furniture','room'] },
+  { e:'🪴', kw:['plant','pot','home','green','indoor','decor'] },
+  { e:'🕯️', kw:['candle','light','flame','cozy','relaxing','home'] },
+  { e:'📸', kw:['camera','photo','picture','photography','snap'] },
+
+  // FOOD
+  { e:'🍕', kw:['pizza','food','cheese','italian','slice'] },
+  { e:'🍔', kw:['burger','hamburger','food','fast','meal'] },
+  { e:'🌮', kw:['taco','food','mexican','tuesday'] },
+  { e:'🍩', kw:['donut','doughnut','sweet','dessert','food'] },
+  { e:'🍪', kw:['cookie','sweet','dessert','snack','baked'] },
+  { e:'🍓', kw:['strawberry','fruit','berry','red','sweet'] },
+  { e:'🍉', kw:['watermelon','fruit','summer','sweet','red'] },
+  { e:'🥑', kw:['avocado','fruit','green','healthy','food'] },
+  { e:'🍦', kw:['ice','cream','dessert','sweet','cone','summer'] },
+
+  // TRAVEL & SPORTS
+  { e:'✈️', kw:['plane','airplane','travel','fly','trip','vacation'] },
+  { e:'🚗', kw:['car','drive','road','travel','vehicle','auto'] },
+  { e:'⛱️', kw:['beach','umbrella','sun','vacation','summer'] },
+  { e:'🏖️', kw:['beach','sun','vacation','summer','sand'] },
+  { e:'⚽', kw:['soccer','football','ball','sport','game'] },
+  { e:'🏈', kw:['football','sport','game','american'] },
+  { e:'🎾', kw:['tennis','sport','ball','game','racket'] },
+  { e:'🎵', kw:['music','note','song','melody','sound'] },
+  { e:'🎶', kw:['music','notes','song','melody','sound'] },
+  { e:'🎤', kw:['microphone','sing','karaoke','music','voice'] },
+
+  // FLAGS & SYMBOLS
+  { e:'🏳️‍🌈', kw:['rainbow','flag','pride','lgbtq','love'] },
+  { e:'🇺🇸', kw:['usa','america','flag','american','united','states'] },
+  { e:'✌️', kw:['peace','victory','sign','hand','two'] },
+  { e:'🤞', kw:['fingers','crossed','luck','hope','wish'] },
+  { e:'👏', kw:['clap','applause','bravo','congratulations','hands'] },
+  { e:'🙌', kw:['hands','celebration','raise','praise','hooray'] },
+  { e:'🤝', kw:['handshake','deal','agreement','partnership','business'] },
+];
+
+
+function setupEmojiMixer() {
+  const input = document.getElementById('emojiSearchInput');
+  const results = document.getElementById('emojiResults');
+  const bar = document.getElementById('emojiSelectedBar');
+  const display = document.getElementById('selectedEmojiDisplay');
+  const clearBtn = document.getElementById('clearEmojiBtn');
+  const showAllBtn = document.getElementById('showAllEmojiBtn');
+  let showingAll = false;
+
+  input.addEventListener('input', () => {
+    const q = input.value.toLowerCase().trim();
+    showingAll = false;
+    showAllBtn.classList.remove('active');
+    showAllBtn.textContent = 'Show All';
+    if (q.length === 0) { results.innerHTML = ''; return; }
+    renderItems(q);
+  });
+
+  showAllBtn.addEventListener('click', () => {
+    showingAll = !showingAll;
+    if (showingAll) {
+      showAllBtn.classList.add('active');
+      showAllBtn.textContent = 'Hide All';
+      input.value = '';
+      renderItems(null);
+    } else {
+      showAllBtn.classList.remove('active');
+      showAllBtn.textContent = 'Show All';
+      results.innerHTML = '';
+    }
+  });
+
+  clearBtn.addEventListener('click', () => {
+    selectedEmoji = null;
+    bar.style.display = 'none';
+    input.value = '';
+    results.innerHTML = '';
+    showingAll = false;
+    showAllBtn.classList.remove('active');
+    showAllBtn.textContent = 'Show All';
+  });
+
+  function renderItems(q) {
+    results.innerHTML = '';
+    const filtered = q === null ? emojiData : emojiData.filter(d => d.kw.some(k => k.includes(q)));
+    filtered.forEach(d => {
+      const el = document.createElement('div');
+      el.className = 'emoji-option';
+      el.textContent = d.e;
+      el.addEventListener('click', () => {
+        selectedEmoji = d.e;
+        display.textContent = d.e;
+        bar.style.display = 'flex';
+        results.innerHTML = '';
+        input.value = '';
+        showingAll = false;
+        showAllBtn.classList.remove('active');
+        showAllBtn.textContent = 'Show All';
+      });
+      results.appendChild(el);
+    });
+  }
+}
+
+// =============================================
+// CATEGORIES
+// =============================================
+const categories = ['All','Burst','Rain','Cannon','Fireworks','Float','Spiral','Wave','Fountain','Cascade'];
+
+// =============================================
+// 100 EFFECTS DEFINITIONS
+// =============================================
+const effects = [
+  // BURST (1-19)
+  { id:1, name:'Classic Burst', cat:'Burst', desc:'The original. A single burst from center screen.' },
+  { id:2, name:'Double Burst', cat:'Burst', desc:'Two bursts in quick succession.' },
+  { id:3, name:'Triple Pop', cat:'Burst', desc:'Three rapid bursts, building intensity.' },
+  { id:4, name:'Soft Burst', cat:'Burst', desc:'Gentle, slow-falling particles from center.' },
+  { id:5, name:'Big Bang', cat:'Burst', desc:'Massive particle count, full spread.' },
+  { id:6, name:'Micro Pop', cat:'Burst', desc:'Tiny, delicate burst. Understated elegance.' },
+  { id:7, name:'Gravity Drop', cat:'Burst', desc:'Heavy particles that fall fast with weight.' },
+  { id:8, name:'Floaty Burst', cat:'Burst', desc:'Low gravity, particles hang in the air.' },
+  { id:9, name:'Pulse Burst', cat:'Burst', desc:'Three expanding rings of particles.' },
+  { id:10, name:'Wide Scatter', cat:'Burst', desc:'180-degree spread, fills the screen.' },
+  { id:11, name:'Center Explosion', cat:'Burst', desc:'360-degree burst from dead center.' },
+  { id:12, name:'Low Burst', cat:'Burst', desc:'Explodes from the bottom of the screen.' },
+  { id:13, name:'High Burst', cat:'Burst', desc:'Bursts from the top and rains down.' },
+  { id:14, name:'Left Burst', cat:'Burst', desc:'Explodes from the left edge.' },
+  { id:15, name:'Right Burst', cat:'Burst', desc:'Explodes from the right edge.' },
+  { id:16, name:'Corner Pop', cat:'Burst', desc:'Four simultaneous corner bursts.' },
+  { id:17, name:'Diagonal Cross', cat:'Burst', desc:'Two bursts from opposite corners.' },
+  { id:18, name:'Rising Burst', cat:'Burst', desc:'Particles shoot upward then float down.' },
+  { id:19, name:'Staggered Burst', cat:'Burst', desc:'Five bursts at half-second intervals.' },
+
+  // RAIN (20-29)
+  { id:20, name:'Monsoon', cat:'Rain', desc:'Dense, fast, full-coverage rain.' },
+  { id:21, name:'Heavy Rain', cat:'Rain', desc:'Dense, fast particles raining down.' },
+  { id:22, name:'Scattered Drizzle', cat:'Rain', desc:'Sparse, random drops from the top.' },
+  { id:23, name:'Crossfire Rain', cat:'Rain', desc:'Rain from both angles simultaneously.' },
+  { id:24, name:'Diamond Rain', cat:'Rain', desc:'Heavy large pieces, fast fall.' },
+  { id:25, name:'Crystal Rain', cat:'Rain', desc:'Large sparkling pieces raining fast.' },
+  { id:26, name:'Blizzard', cat:'Rain', desc:'Dense and swirling. Full coverage.' },
+  { id:27, name:'Confetti Blitz', cat:'Rain', desc:'Rapid fire from everywhere.' },
+  { id:28, name:'Luxe Downpour', cat:'Rain', desc:'Big luxurious pieces, faster fall, wider coverage.' },
+  { id:29, name:'Petal Storm', cat:'Rain', desc:'Petals everywhere, full page, faster.' },
+
+  // CANNON (30-39)
+  { id:30, name:'Power Blast Left', cat:'Cannon', desc:'Massive cannon, shoots all the way across.' },
+  { id:31, name:'Power Blast Right', cat:'Cannon', desc:'Massive cannon, shoots all the way across.' },
+  { id:32, name:'Dual Cannons', cat:'Cannon', desc:'Both sides fire simultaneously.' },
+  { id:33, name:'Alternating Cannons', cat:'Cannon', desc:'Left then right, back and forth.' },
+  { id:34, name:'Floor Eruption', cat:'Cannon', desc:'Massive upward blast from bottom, reaches top.' },
+  { id:35, name:'Power Cannon', cat:'Cannon', desc:'High velocity, long distance.' },
+  { id:36, name:'Shotgun Blast', cat:'Cannon', desc:'Wide-angle powerful cannon.' },
+  { id:37, name:'Triple Cannon Left', cat:'Cannon', desc:'Three rapid shots from the left.' },
+  { id:38, name:'Triple Cannon Right', cat:'Cannon', desc:'Three rapid shots from the right.' },
+  { id:39, name:'Cannon Barrage', cat:'Cannon', desc:'Continuous fire from both sides for 5 seconds.' },
+
+  // FIREWORKS (40-54)
+  { id:40, name:'Single Firework', cat:'Fireworks', desc:'One burst at a random height.' },
+  { id:41, name:'Firework Show', cat:'Fireworks', desc:'Multiple bursts over 3 seconds.' },
+  { id:42, name:'Grand Finale', cat:'Fireworks', desc:'Rapid-fire bursts filling the sky.' },
+  { id:43, name:'Slow Fireworks', cat:'Fireworks', desc:'Spaced-out bursts with long hang time.' },
+  { id:44, name:'Low Fireworks', cat:'Fireworks', desc:'Bursts stay in the lower half of screen.' },
+  { id:45, name:'High Fireworks', cat:'Fireworks', desc:'Bursts only in the upper third.' },
+  { id:46, name:'Left Sky', cat:'Fireworks', desc:'Fireworks only on the left side.' },
+  { id:47, name:'Right Sky', cat:'Fireworks', desc:'Fireworks only on the right side.' },
+  { id:48, name:'Symmetrical Show', cat:'Fireworks', desc:'Mirrored fireworks, left and right.' },
+  { id:49, name:'Encore', cat:'Fireworks', desc:'Building intensity finale over 5 seconds.' },
+  { id:50, name:'Full Sky', cat:'Fireworks', desc:'Fireworks everywhere, full screen width.' },
+  { id:51, name:'Night Sky', cat:'Fireworks', desc:'6 seconds of varied continuous fireworks.' },
+  { id:52, name:'Midnight Toast', cat:'Fireworks', desc:'Slow build to massive fireworks finale.' },
+  { id:53, name:'Sky Burst', cat:'Fireworks', desc:'Three big fireworks at different positions.' },
+  { id:54, name:'Opening Night', cat:'Fireworks', desc:'Sequential fireworks building for 8 seconds.' },
+
+  // FLOAT (55-64)
+  { id:55, name:'Slow Float', cat:'Float', desc:'Ultra-slow descent, dreamy feel.' },
+  { id:56, name:'Luxury Drift', cat:'Float', desc:'Big pieces drifting across entire screen.' },
+  { id:57, name:'Rising Glow', cat:'Float', desc:'Particles rising from bottom to top of page.' },
+  { id:58, name:'Dust Motes', cat:'Float', desc:'Tiny particles suspended in air.' },
+  { id:59, name:'Sky Lanterns', cat:'Float', desc:'Bigger pieces rising high and wide.' },
+  { id:60, name:'Dandelion', cat:'Float', desc:'Wispy pieces floating in all directions.' },
+  { id:61, name:'Confetti Rise', cat:'Float', desc:'Pieces rising gently from below, drifting wide.' },
+  { id:62, name:'Cloud Drift', cat:'Float', desc:'Large, slow, sparse pieces drifting across.' },
+  { id:63, name:'Fairy Dust', cat:'Float', desc:'Tiny sparkles that linger.' },
+  { id:64, name:'Zen Float', cat:'Float', desc:'Minimal, meditative, slow movement.' },
+
+  // SPIRAL (65-72)
+  { id:65, name:'Clockwise Spiral', cat:'Spiral', desc:'Particles spiral outward clockwise.' },
+  { id:66, name:'Counter Spiral', cat:'Spiral', desc:'Counter-clockwise spiral outward.' },
+  { id:67, name:'Double Helix', cat:'Spiral', desc:'Two intertwined spirals.' },
+  { id:68, name:'Pinwheel', cat:'Spiral', desc:'Spinning confetti flung outward from center.' },
+  { id:69, name:'Stardust Spiral', cat:'Spiral', desc:'Wide beautiful spiral, full coverage.' },
+  { id:70, name:'Whirlpool', cat:'Spiral', desc:'Particles spiral inward to center.' },
+  { id:71, name:'Superspiral', cat:'Spiral', desc:'Fast expanding spiral covering full page.' },
+  { id:72, name:'Comet Trail', cat:'Spiral', desc:'Particles streaming in a wide arc.' },
+
+  // WAVE (73-80)
+  { id:73, name:'Sweep Left', cat:'Wave', desc:'Massive sweep covering full page.' },
+  { id:74, name:'Sweep Right', cat:'Wave', desc:'Massive sweep covering full page.' },
+  { id:75, name:'Ripple', cat:'Wave', desc:'Expanding rings from center.' },
+  { id:76, name:'Double Ripple', cat:'Wave', desc:'Two overlapping ripple patterns.' },
+  { id:77, name:'Grand Curtain', cat:'Wave', desc:'Massive curtain covering full page.' },
+  { id:78, name:'Color Wave', cat:'Wave', desc:'Big bold wave, full coverage.' },
+  { id:79, name:'Wall of Color', cat:'Wave', desc:'Massive wall covering entire screen height.' },
+  { id:80, name:'Tidal Wave', cat:'Wave', desc:'Even bigger. Full screen wall of particles.' },
+
+  // FOUNTAIN (81-88)
+  { id:81, name:'Center Fountain', cat:'Fountain', desc:'Particles shoot up and fall like water.' },
+  { id:82, name:'Double Fountain', cat:'Fountain', desc:'Two fountains side by side.' },
+  { id:83, name:'Geyser', cat:'Fountain', desc:'Powerful upward burst from bottom center.' },
+  { id:84, name:'Sparkler', cat:'Fountain', desc:'Sparkler spraying from center of page.' },
+  { id:85, name:'Roman Candle', cat:'Fountain', desc:'Sequential shots upward from one point.' },
+  { id:86, name:'Triple Fountain', cat:'Fountain', desc:'Three fountains spread across the bottom.' },
+  { id:87, name:'Power Geyser', cat:'Fountain', desc:'Extremely powerful upward burst.' },
+  { id:88, name:'Champagne Fountain', cat:'Fountain', desc:'Continuous elegant upward spray.' },
+
+  // CASCADE (89-100)
+  { id:89, name:'Cascade Storm', cat:'Cascade', desc:'Massive full-page cascading bursts from multiple heights.' },
+  { id:90, name:'Staircase', cat:'Cascade', desc:'Bursts stepping down across the screen.' },
+  { id:91, name:'Meteor Shower', cat:'Cascade', desc:'Rapid diagonal bursts across the screen.' },
+  { id:92, name:'Avalanche', cat:'Cascade', desc:'Starts small at the top, grows massive.' },
+  { id:93, name:'Rolling Thunder', cat:'Cascade', desc:'Sequential bursts growing in intensity.' },
+  { id:94, name:'Chain Reaction', cat:'Cascade', desc:'12 rapid-fire bursts across the screen.' },
+  { id:95, name:'Standing Ovation', cat:'Cascade', desc:'Cannons + fireworks + rain all at once.' },
+  { id:96, name:'Victory Lap', cat:'Cascade', desc:'Spiral into burst into rain.' },
+  { id:97, name:'Red Carpet', cat:'Cascade', desc:'Dual cannons into cascade into burst.' },
+  { id:98, name:'Supernova', cat:'Cascade', desc:'Starts tiny, builds to massive explosion.' },
+  { id:99, name:'Curtain Call', cat:'Cascade', desc:'Full-width cascade from top to bottom.' },
+  { id:100, name:'Grand Celebration', cat:'Cascade', desc:'Everything at once. The full experience.' },
+];
+
+// =============================================
+// RENDER COLOR SLOTS
+// =============================================
+function renderColorSlots() {
+  const container = document.getElementById('colorSlots');
+  container.innerHTML = '';
+  colors.forEach((c, i) => {
+    const slot = document.createElement('div');
+    const isEmpty = c === null;
+    slot.className = 'color-slot' + (isEmpty ? ' empty' : '');
+    if (isEmpty) {
+      slot.innerHTML = `<div class="color-swatch empty-swatch">+</div><input class="color-hex empty-hex" value="empty" maxlength="7" data-index="${i}" readonly>`;
+    } else {
+      slot.innerHTML = `<div class="color-swatch" style="background:${c}"></div><input class="color-hex" value="${c}" maxlength="7" data-index="${i}">`;
+    }
+    // Click swatch → open hex color picker
+    slot.addEventListener('click', (e) => {
+      if (e.target.classList.contains('color-hex') && !e.target.classList.contains('empty-hex')) return;
+      cpickerOpen(i, slot);
+    });
+    // Right-click to clear a slot
+    slot.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      if (!isEmpty) {
+        colors[i] = null;
+        Object.keys(shapeColorAssignments).forEach(k => {
+          if (shapeColorAssignments[k] === c) shapeColorAssignments[k] = null;
+        });
+        renderColorSlots();
+        renderShapeGrid();
+      }
+    });
+    container.appendChild(slot);
+  });
+  // Hex input fields: direct hex editing
+  document.querySelectorAll('.color-hex:not(.empty-hex)').forEach(input => {
+    input.addEventListener('change', (e) => {
+      let val = e.target.value.trim();
+      if (!val.startsWith('#')) val = '#' + val;
+      if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
+        colors[parseInt(e.target.dataset.index)] = val.toUpperCase();
+        renderColorSlots();
+        renderShapeGrid();
+      }
+    });
+    input.addEventListener('click', (e) => e.stopPropagation());
+  });
+}
+
+// Get active (non-null) colors for confetti, with fallback
+function getActiveColors() {
+  const active = colors.filter(c => c !== null);
+  if (active.length === 0) return ['#000000', '#333333', '#666666', '#FFFFFF'];
+  return active;
+}
+
+// =============================================
+// CUSTOM HEX COLOR PICKER (no RGB, gradient + hue bar + hex input)
+// =============================================
+let cpickerIndex = -1;
+let cpickerMode = 'palette';  // 'palette' or 'shape'
+let cpickerShapeId = null;
+let cpickerHue = 0;     // 0-360
+let cpickerSat = 1;     // 0-1
+let cpickerVal = 1;     // 0-1
+let cpickerDraggingGrad = false;
+let cpickerDraggingHue = false;
+
+// --- Color conversion helpers ---
+function hsvToHex(h, s, v) {
+  const f = (n) => {
+    const k = (n + h / 60) % 6;
+    return Math.round((v - v * s * Math.max(0, Math.min(k, 4 - k, 1))) * 255);
+  };
+  const r = f(5), g = f(3), b = f(1);
+  return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('').toUpperCase();
+}
+
+function hexToHsv(hex) {
+  hex = hex.replace('#', '');
+  const r = parseInt(hex.substr(0, 2), 16) / 255;
+  const g = parseInt(hex.substr(2, 2), 16) / 255;
+  const b = parseInt(hex.substr(4, 2), 16) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  const d = max - min;
+  let h = 0;
+  if (d !== 0) {
+    if (max === r) h = ((g - b) / d + 6) % 6;
+    else if (max === g) h = (b - r) / d + 2;
+    else h = (r - g) / d + 4;
+    h *= 60;
+  }
+  const s = max === 0 ? 0 : d / max;
+  return { h, s, v: max };
+}
+
+// --- Draw gradient canvas (saturation x brightness for current hue) ---
+function cpickerDrawGradient() {
+  const canvas = document.getElementById('cpickerGradientCanvas');
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width;
+  canvas.height = rect.height;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  // Base hue color
+  const hueColor = hsvToHex(cpickerHue, 1, 1);
+  // White → hue (horizontal)
+  const gradH = ctx.createLinearGradient(0, 0, w, 0);
+  gradH.addColorStop(0, '#FFFFFF');
+  gradH.addColorStop(1, hueColor);
+  ctx.fillStyle = gradH;
+  ctx.fillRect(0, 0, w, h);
+  // Transparent → black (vertical)
+  const gradV = ctx.createLinearGradient(0, 0, 0, h);
+  gradV.addColorStop(0, 'rgba(0,0,0,0)');
+  gradV.addColorStop(1, '#000000');
+  ctx.fillStyle = gradV;
+  ctx.fillRect(0, 0, w, h);
+}
+
+// --- Draw hue bar ---
+function cpickerDrawHue() {
+  const canvas = document.getElementById('cpickerHueCanvas');
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width;
+  canvas.height = rect.height;
+  const ctx = canvas.getContext('2d');
+  const grad = ctx.createLinearGradient(0, 0, canvas.width, 0);
+  const stops = [0, 60, 120, 180, 240, 300, 360];
+  const colors = ['#FF0000', '#FFFF00', '#00FF00', '#00FFFF', '#0000FF', '#FF00FF', '#FF0000'];
+  stops.forEach((s, i) => grad.addColorStop(s / 360, colors[i]));
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+// --- Update UI from HSV state ---
+function cpickerUpdateUI() {
+  const hex = hsvToHex(cpickerHue, cpickerSat, cpickerVal);
+  document.getElementById('cpickerHexInput').value = hex;
+  document.getElementById('cpickerSwatch').style.background = hex;
+  // Gradient cursor position
+  const gradEl = document.getElementById('cpickerGradient');
+  const cursor = document.getElementById('cpickerCursor');
+  cursor.style.left = (cpickerSat * 100) + '%';
+  cursor.style.top = ((1 - cpickerVal) * 100) + '%';
+  // Hue thumb position
+  const hueWrap = document.getElementById('cpickerHueWrap');
+  const thumb = document.getElementById('cpickerHueThumb');
+  thumb.style.left = (cpickerHue / 360 * 100) + '%';
+}
+
+// --- Open picker for palette color ---
+function cpickerOpen(index, anchorEl) {
+  cpickerMode = 'palette';
+  cpickerIndex = index;
+  cpickerShapeId = null;
+  const currentColor = colors[index] || '#000000';
+  const hsv = hexToHsv(currentColor);
+  cpickerHue = hsv.h;
+  cpickerSat = hsv.s;
+  cpickerVal = hsv.v;
+
+  const overlay = document.getElementById('cpickerOverlay');
+  const picker = document.getElementById('cpicker');
+  const rect = anchorEl.getBoundingClientRect();
+  picker.style.left = Math.min(rect.left, window.innerWidth - 260) + 'px';
+  picker.style.top = Math.min(rect.bottom + 6, window.innerHeight - 300) + 'px';
+  overlay.classList.add('visible');
+
+  // Draw after visible so dimensions are correct
+  requestAnimationFrame(() => {
+    cpickerDrawGradient();
+    cpickerDrawHue();
+    cpickerUpdateUI();
+  });
+}
+
+// --- Open picker for shape color ---
+function cpickerOpenForShape(shapeId, anchorEl) {
+  cpickerMode = 'shape';
+  cpickerShapeId = shapeId;
+  cpickerIndex = -1;
+  const currentColor = shapeColorAssignments[shapeId] || '#FFFFFF';
+  const hsv = hexToHsv(currentColor);
+  cpickerHue = hsv.h;
+  cpickerSat = hsv.s;
+  cpickerVal = hsv.v;
+
+  const overlay = document.getElementById('cpickerOverlay');
+  const picker = document.getElementById('cpicker');
+  const rect = anchorEl.getBoundingClientRect();
+  picker.style.left = Math.min(rect.left, window.innerWidth - 260) + 'px';
+  picker.style.top = Math.min(rect.bottom + 6, window.innerHeight - 300) + 'px';
+  overlay.classList.add('visible');
+
+  // Draw after visible so dimensions are correct
+  requestAnimationFrame(() => {
+    cpickerDrawGradient();
+    cpickerDrawHue();
+    cpickerUpdateUI();
+  });
+}
+
+function cpickerClose() {
+  document.getElementById('cpickerOverlay').classList.remove('visible');
+  cpickerIndex = -1;
+  cpickerMode = 'palette';
+  cpickerShapeId = null;
+  cpickerDraggingGrad = false;
+  cpickerDraggingHue = false;
+}
+
+function cpickerSave() {
+  let val = document.getElementById('cpickerHexInput').value.trim();
+  if (!val.startsWith('#')) val = '#' + val;
+  if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
+    if (cpickerMode === 'palette' && cpickerIndex >= 0) {
+      colors[cpickerIndex] = val.toUpperCase();
+      renderColorSlots();
+      renderShapeGrid();
+    } else if (cpickerMode === 'shape' && cpickerShapeId) {
+      shapeColorAssignments[cpickerShapeId] = val.toUpperCase();
+      renderShapeGrid();
+    }
+  }
+  cpickerClose();
+}
+
+// --- Gradient interaction ---
+function cpickerGradientPick(e) {
+  const rect = document.getElementById('cpickerGradientCanvas').getBoundingClientRect();
+  const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  const y = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+  cpickerSat = x;
+  cpickerVal = 1 - y;
+  cpickerUpdateUI();
+}
+
+document.getElementById('cpickerGradient').addEventListener('mousedown', (e) => {
+  cpickerDraggingGrad = true;
+  cpickerGradientPick(e);
+});
+
+// --- Hue bar interaction ---
+function cpickerHuePick(e) {
+  const rect = document.getElementById('cpickerHueCanvas').getBoundingClientRect();
+  const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  cpickerHue = x * 360;
+  cpickerDrawGradient();
+  cpickerUpdateUI();
+}
+
+document.getElementById('cpickerHueWrap').addEventListener('mousedown', (e) => {
+  cpickerDraggingHue = true;
+  cpickerHuePick(e);
+});
+
+// --- Global mouse events for dragging ---
+document.addEventListener('mousemove', (e) => {
+  if (cpickerDraggingGrad) cpickerGradientPick(e);
+  if (cpickerDraggingHue) cpickerHuePick(e);
+});
+document.addEventListener('mouseup', () => {
+  cpickerDraggingGrad = false;
+  cpickerDraggingHue = false;
+});
+
+// --- Hex input: type to update ---
+document.getElementById('cpickerHexInput').addEventListener('input', (e) => {
+  let val = e.target.value.trim();
+  if (!val.startsWith('#')) val = '#' + val;
+  if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
+    const hsv = hexToHsv(val);
+    cpickerHue = hsv.h;
+    cpickerSat = hsv.s;
+    cpickerVal = hsv.v;
+    cpickerDrawGradient();
+    cpickerUpdateUI();
+    // Don't overwrite input while typing
+    document.getElementById('cpickerSwatch').style.background = val;
+  }
+});
+
+document.getElementById('cpickerHexInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') cpickerSave();
+  if (e.key === 'Escape') cpickerClose();
+});
+
+// Click overlay to close
+document.getElementById('cpickerOverlay').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) cpickerClose();
+});
+
+// =============================================
+// RENDER PRESETS
+// =============================================
+function renderPresets() {
+  const container = document.getElementById('presetList');
+  container.innerHTML = '';
+  presets.forEach(p => {
+    const row = document.createElement('div');
+    row.className = 'preset-row';
+    row.innerHTML = p.colors.map(c => `<div class="preset-dot" style="background:${c}"></div>`).join('') + `<span class="preset-name">${p.name}</span>`;
+    row.addEventListener('click', () => {
+      colors = [...p.colors];
+      renderColorSlots();
+      renderShapeGrid(); // update color dots under shapes
+    });
+    container.appendChild(row);
+  });
+}
+
+// =============================================
+// RENDER CATEGORY PILLS
+// =============================================
+let activeCategory = 'All';
+function renderCategories() {
+  const container = document.getElementById('categoryPills');
+  container.innerHTML = '';
+  categories.forEach(cat => {
+    const pill = document.createElement('button');
+    pill.className = 'cat-pill' + (activeCategory === cat ? ' active' : '');
+    pill.textContent = cat;
+    pill.addEventListener('click', () => {
+      activeCategory = cat;
+      renderCategories();
+      renderEffects();
+    });
+    container.appendChild(pill);
+  });
+}
+
+// =============================================
+// MULTI-SELECT STATE
+// =============================================
+let selectedEffects = new Set();
+const MAX_SELECTED = 4;
+
+function toggleEffectSelection(id, card) {
+  if (selectedEffects.has(id)) {
+    selectedEffects.delete(id);
+    card.classList.remove('selected');
+    updatePlayBar();
+    return false; // was deselected
+  } else {
+    if (selectedEffects.size >= MAX_SELECTED) return false;
+    selectedEffects.add(id);
+    card.classList.add('selected');
+    updatePlayBar();
+    return true; // was selected
+  }
+}
+
+function updatePlayBar() {
+  const bar = document.getElementById('playBar');
+  const countEl = document.getElementById('selectedCount');
+  const namesEl = document.getElementById('selectedNames');
+  countEl.textContent = selectedEffects.size;
+  if (selectedEffects.size > 0) {
+    bar.classList.add('visible');
+    const names = [...selectedEffects].map(id => {
+      const e = effects.find(ef => ef.id === id);
+      return e ? e.name : '';
+    }).join(' + ');
+    namesEl.textContent = names;
+  } else {
+    bar.classList.remove('visible');
+    namesEl.textContent = '';
+  }
+}
+
+function playSelectedEffects() {
+  if (selectedEffects.size === 0) return;
+  selectedEffects.forEach(id => triggerEffect(id));
+}
+
+function clearSelectedEffects() {
+  selectedEffects.clear();
+  document.querySelectorAll('.effect-card.selected').forEach(c => c.classList.remove('selected'));
+  updatePlayBar();
+}
+
+// =============================================
+// RENDER EFFECTS GRID (no numbers, no cat tag)
+// =============================================
+function renderEffects() {
+  const container = document.getElementById('effectsGrid');
+  container.innerHTML = '';
+  const filtered = activeCategory === 'All' ? effects : effects.filter(e => e.cat === activeCategory);
+  filtered.forEach(effect => {
+    const card = document.createElement('div');
+    card.className = 'effect-card' + (selectedEffects.has(effect.id) ? ' selected' : '');
+    card.innerHTML = `
+      <div class="name">${effect.name}</div>
+      <div class="desc">${effect.desc}</div>
+      <button class="copy-btn" onclick="event.stopPropagation(); copyCode(${effect.id})">Copy Code</button>
+    `;
+    // Single click: toggle selection; only preview on SELECT (not deselect)
+    card.addEventListener('click', (e) => {
+      const wasSelected = toggleEffectSelection(effect.id, card);
+      if (wasSelected) triggerEffect(effect.id);
+    });
+    container.appendChild(card);
+  });
+}
+
+// =============================================
+// COPY CODE
+// =============================================
+function copyCode(id) {
+  const code = generateSnippet(id);
+  navigator.clipboard.writeText(code).then(() => {
+    const btn = event.target;
+    btn.textContent = 'Copied';
+    setTimeout(() => btn.textContent = 'Copy Code', 1500);
+  });
+}
+
+function generateSnippet(id) {
+  const activeC = getActiveColors();
+  return `<!-- CONFETTI BAR™ by SAINT IVY - Effect #${id} -->\n<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"><\/script>\n<script>\n(function(){\n  var colors = ${JSON.stringify(activeC)};\n  confetti({ particleCount: 300, spread: 100, colors: colors, origin: { y: 0.6 } });\n})();\n<\/script>`;
+}
+
+// =============================================
+// EFFECT TRIGGER ENGINE
+// =============================================
+function triggerEffect(id) {
+  const c = getActiveColors();
+  const activeShapes = getActiveShapes();
+
+  // Get mixer emoji shapes (larger than confetti but not overwhelming)
+  let mixShapes = undefined;
+  if (selectedEmoji) {
+    try { mixShapes = [confetti.shapeFromText({ text: selectedEmoji, scalar: 3 })]; } catch(e) {}
+  }
+
+  // Check if any shape has a specific color assignment
+  const hasAssignments = Object.values(shapeColorAssignments).some(v => v !== null && v !== undefined);
+
+  // Split shapes into native (circle/square) and custom (shapeFromPath) for separate scaling
+  const nativeShapeIds = new Set(['circle', 'square']);
+  const nativeShapes = [];
+  const customShapesList = [];
+  const shapeIdArr = [...selectedShapes];
+  activeShapes.forEach((shape, idx) => {
+    if (nativeShapeIds.has(shapeIdArr[idx])) nativeShapes.push({ shape, id: shapeIdArr[idx] });
+    else customShapesList.push({ shape, id: shapeIdArr[idx] });
+  });
+  const NATIVE_SCALAR = 1.4;
+  const CUSTOM_SCALAR = 2.0;
+
+  // Helper: fire a confetti call with proper scalar based on shape type
+  function fireShapes(shapes, colors, scalar, opts, pCount) {
+    if (shapes.length === 0) return;
+    confetti({ colors, ticks: 200, shapes, scalar, ...opts, particleCount: pCount });
+  }
+
+  // Burst helper: fires confetti (prominent) + emoji (moderate)
+  function burst(opts) {
+    const totalParticles = opts.particleCount || 150;
+
+    if (hasAssignments) {
+      // Assigned: fire each shape individually with its color and correct scalar
+      shapeIdArr.forEach((shapeId, idx) => {
+        const shape = activeShapes[idx];
+        const assignedColor = shapeColorAssignments[shapeId];
+        const sc = nativeShapeIds.has(shapeId) ? NATIVE_SCALAR : CUSTOM_SCALAR;
+        const pCount = Math.max(Math.floor(totalParticles / activeShapes.length), 5);
+        const cc = assignedColor ? [assignedColor] : c;
+        confetti({ colors: cc, ticks: 200, shapes: [shape], scalar: sc, ...opts, particleCount: pCount });
+      });
+    } else {
+      // Unassigned: fire native and custom shapes separately at different scalars
+      const nativeS = nativeShapes.map(s => s.shape);
+      const customS = customShapesList.map(s => s.shape);
+      const total = nativeS.length + customS.length;
+      if (nativeS.length > 0) {
+        const pCount = Math.max(Math.floor(totalParticles * nativeS.length / total), 5);
+        fireShapes(nativeS, c, NATIVE_SCALAR, opts, pCount);
+      }
+      if (customS.length > 0) {
+        const pCount = Math.max(Math.floor(totalParticles * customS.length / total), 5);
+        fireShapes(customS, c, CUSTOM_SCALAR, opts, pCount);
+      }
+      if (total === 0) {
+        confetti({ colors: c, ticks: 200, shapes: ['circle'], scalar: NATIVE_SCALAR, ...opts });
+      }
+    }
+
+    // EMOJI overlay — moderate amount (10% of particles), larger than confetti
+    if (mixShapes) {
+      confetti({ colors: c, ticks: 200, ...opts, shapes: mixShapes, scalar: 3, particleCount: Math.max(Math.floor(totalParticles * 0.10), 2) });
+    }
+  }
+  function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+  function rng(min, max) { return Math.random() * (max - min) + min; }
+  function loopFor(duration, interval, fn) {
+    const end = Date.now() + duration;
+    const timer = setInterval(() => { if (Date.now() > end) return clearInterval(timer); fn(); }, interval);
+  }
+  function frameFor(duration, fn) {
+    const end = Date.now() + duration;
+    (function frame() { fn(); if (Date.now() < end) requestAnimationFrame(frame); })();
+  }
+
+  switch(id) {
+    // BURST 1-19 (punchy but breathable)
+    case 1: burst({ particleCount:80, spread:160, origin:{y:0.6}, startVelocity:50 }); break;
+    case 2: burst({ particleCount:60, spread:140, origin:{y:0.6}, startVelocity:45 }); delay(300).then(()=> burst({ particleCount:70, spread:140, origin:{y:0.55}, startVelocity:50 })); break;
+    case 3: burst({ particleCount:50, spread:150, origin:{y:0.6}, startVelocity:45 }); delay(250).then(()=>burst({ particleCount:70, spread:160, origin:{y:0.55}, startVelocity:50 })); delay(500).then(()=>burst({ particleCount:100, spread:180, origin:{y:0.5}, startVelocity:55 })); break;
+    case 4: burst({ particleCount:80, spread:360, origin:{y:0.5}, gravity:0.3, startVelocity:35, ticks:180, decay:0.96 }); break;
+    case 5: burst({ particleCount:150, spread:220, origin:{y:0.6}, startVelocity:60 }); break;
+    case 6: burst({ particleCount:35, spread:100, origin:{y:0.6}, gravity:0.6, startVelocity:35 }); break;
+    case 7: burst({ particleCount:80, spread:140, origin:{y:0.5}, gravity:2, startVelocity:55, ticks:100 }); break;
+    case 8: burst({ particleCount:70, spread:200, origin:{y:0.6}, gravity:0.15, startVelocity:30, ticks:140, decay:0.97 }); break;
+    case 9: burst({particleCount:50,spread:360,startVelocity:45,origin:{x:0.5,y:0.5}}); delay(200).then(()=>burst({particleCount:70,spread:360,startVelocity:55,origin:{x:0.5,y:0.5}})); delay(400).then(()=>burst({particleCount:100,spread:360,startVelocity:65,origin:{x:0.5,y:0.5}})); break;
+    case 10: burst({ particleCount:120, spread:240, origin:{y:0.6}, startVelocity:50 }); break;
+    case 11: burst({ particleCount:120, spread:360, startVelocity:55, origin:{x:0.5,y:0.5} }); break;
+    case 12: burst({ particleCount:100, spread:180, origin:{x:0.5,y:1}, startVelocity:65 }); break;
+    case 13: burst({ particleCount:100, spread:240, origin:{x:0.5,y:0}, startVelocity:45, gravity:0.6 }); break;
+    case 14: burst({ particleCount:80, spread:160, origin:{x:0,y:0.5}, angle:0, startVelocity:60 }); break;
+    case 15: burst({ particleCount:80, spread:160, origin:{x:1,y:0.5}, angle:180, startVelocity:60 }); break;
+    case 16: burst({particleCount:40,spread:120,origin:{x:0,y:0},angle:315,startVelocity:50}); burst({particleCount:40,spread:120,origin:{x:1,y:0},angle:225,startVelocity:50}); burst({particleCount:40,spread:120,origin:{x:0,y:1},angle:45,startVelocity:50}); burst({particleCount:40,spread:120,origin:{x:1,y:1},angle:135,startVelocity:50}); break;
+    case 17: burst({particleCount:60,spread:120,origin:{x:0,y:0},angle:315,startVelocity:55}); burst({particleCount:60,spread:120,origin:{x:1,y:1},angle:135,startVelocity:55}); break;
+    case 18: burst({ particleCount:80, spread:160, origin:{y:0.8}, startVelocity:70, gravity:1.5 }); break;
+    case 19: for(let i=0;i<5;i++){delay(i*400).then(()=>burst({particleCount:50,spread:160,origin:{y:0.6},startVelocity:50}));} break;
+
+    // RAIN 20-29 — pieces MUST fall the full page (high velocity + ticks + gravity)
+    // 20: Monsoon — dense, fast, full coverage
+    case 20: loopFor(4000,50,()=>burst({particleCount:5,spread:180,startVelocity:55,decay:0.94,gravity:2,ticks:300,origin:{x:Math.random(),y:-0.1}})); break;
+    // 21: Heavy Rain — dense, fast
+    case 21: loopFor(3500,40,()=>burst({particleCount:6,spread:200,startVelocity:50,gravity:2.2,ticks:280,origin:{x:Math.random(),y:-0.1}})); break;
+    // 22: Scattered Drizzle — sparse but pieces DO fall all the way down
+    case 22: loopFor(5000,120,()=>{if(Math.random()>0.2)burst({particleCount:2,spread:100,startVelocity:45,gravity:1.8,ticks:350,origin:{x:Math.random(),y:-0.1}});}); break;
+    // 23: Crossfire Rain — aggressive, from both angles, full page
+    case 23: loopFor(4000,50,()=>{burst({particleCount:5,angle:110,spread:60,startVelocity:55,gravity:1.8,ticks:300,origin:{x:rng(0,0.4),y:-0.1}}); burst({particleCount:5,angle:70,spread:60,startVelocity:55,gravity:1.8,ticks:300,origin:{x:rng(0.6,1),y:-0.1}});}); break;
+    // 24: Diamond Rain — heavy large pieces, fast fall
+    case 24: loopFor(4000,50,()=>burst({particleCount:5,spread:200,startVelocity:50,gravity:2.5,ticks:280,origin:{x:Math.random(),y:-0.1}})); break;
+    // 25: Crystal Rain — sparkling pieces raining fast
+    case 25: loopFor(3500,50,()=>burst({particleCount:5,spread:220,startVelocity:48,gravity:2,ticks:300,origin:{x:Math.random(),y:-0.1}})); break;
+    // 26: Blizzard — dense, swirling, chaotic drift, full coverage
+    case 26: loopFor(4000,35,()=>burst({particleCount:6,spread:360,startVelocity:45,gravity:1.5,ticks:350,origin:{x:Math.random(),y:-0.1},drift:rng(-2.5,2.5)})); break;
+    // 27: Confetti Blitz — rapid fire everywhere, aggressive
+    case 27: loopFor(3500,30,()=>burst({particleCount:7,spread:360,startVelocity:55,gravity:2,ticks:280,origin:{x:Math.random(),y:-0.1},drift:rng(-1,1)})); break;
+    // 28: Luxe Downpour — big pieces, steady fall
+    case 28: loopFor(4000,60,()=>burst({particleCount:4,spread:200,startVelocity:50,gravity:2,ticks:320,origin:{x:Math.random(),y:-0.1},drift:rng(-0.5,0.5)})); break;
+    // 29: Petal Storm — petals everywhere, full page
+    case 29: loopFor(4000,45,()=>burst({particleCount:5,spread:240,startVelocity:48,gravity:1.8,ticks:300,origin:{x:Math.random(),y:-0.1},drift:rng(-1,1)})); break;
+
+    // CANNON 30-39 (powerful shots, not a wall)
+    case 30: burst({particleCount:70,spread:140,angle:60,origin:{x:0,y:0.65},startVelocity:70}); break;
+    case 31: burst({particleCount:70,spread:140,angle:120,origin:{x:1,y:0.65},startVelocity:70}); break;
+    case 32: burst({particleCount:50,spread:140,angle:60,origin:{x:0,y:0.65},startVelocity:70}); burst({particleCount:50,spread:140,angle:120,origin:{x:1,y:0.65},startVelocity:70}); break;
+    case 33: burst({particleCount:50,spread:120,angle:60,origin:{x:0,y:0.65},startVelocity:65}); delay(400).then(()=>burst({particleCount:50,spread:120,angle:120,origin:{x:1,y:0.65},startVelocity:65})); delay(800).then(()=>burst({particleCount:50,spread:120,angle:60,origin:{x:0,y:0.65},startVelocity:65})); delay(1200).then(()=>burst({particleCount:50,spread:120,angle:120,origin:{x:1,y:0.65},startVelocity:65})); break;
+    case 34: burst({particleCount:80,spread:180,angle:90,origin:{x:0.5,y:1},startVelocity:85,gravity:2}); break;
+    case 35: burst({particleCount:70,spread:120,angle:60,origin:{x:0,y:0.7},startVelocity:75}); break;
+    case 36: burst({particleCount:60,spread:180,angle:90,origin:{x:0.5,y:0.85},startVelocity:65}); break;
+    case 37: for(let i=0;i<3;i++){delay(i*200).then(()=>burst({particleCount:40,spread:120,angle:60,origin:{x:0,y:0.65},startVelocity:65}));} break;
+    case 38: for(let i=0;i<3;i++){delay(i*200).then(()=>burst({particleCount:40,spread:120,angle:120,origin:{x:1,y:0.65},startVelocity:65}));} break;
+    case 39: loopFor(5000,200,()=>{burst({particleCount:15,spread:120,angle:60,origin:{x:0,y:0.65},startVelocity:rng(55,75)}); burst({particleCount:15,spread:120,angle:120,origin:{x:1,y:0.65},startVelocity:rng(55,75)});}); break;
+
+    // FIREWORKS 40-54 (distinct bursts, not a wall of confetti)
+    case 40: burst({particleCount:60,spread:360,startVelocity:50,origin:{x:rng(0.2,0.8),y:rng(0.1,0.4)},gravity:1.2}); break;
+    case 41: loopFor(3000,400,()=>burst({particleCount:50,spread:360,startVelocity:45,origin:{x:rng(0.1,0.9),y:rng(0.1,0.5)},gravity:1.2,ticks:80})); break;
+    case 42: loopFor(3000,150,()=>burst({particleCount:25,spread:360,startVelocity:rng(40,60),origin:{x:rng(0.05,0.95),y:rng(0.05,0.5)},gravity:1.2,ticks:80})); break;
+    case 43: loopFor(5000,600,()=>burst({particleCount:60,spread:360,startVelocity:40,origin:{x:rng(0.2,0.8),y:rng(0.1,0.4)},gravity:0.8,ticks:120,decay:0.95})); break;
+    case 44: loopFor(3000,400,()=>burst({particleCount:50,spread:360,startVelocity:40,origin:{x:rng(0.1,0.9),y:rng(0.5,0.8)},gravity:1.1,ticks:80})); break;
+    case 45: loopFor(3000,400,()=>burst({particleCount:50,spread:360,startVelocity:40,origin:{x:rng(0.1,0.9),y:rng(0.05,0.3)},gravity:1,ticks:100})); break;
+    case 46: loopFor(3000,350,()=>burst({particleCount:50,spread:360,startVelocity:45,origin:{x:rng(0.05,0.45),y:rng(0.1,0.5)},gravity:1.2,ticks:80})); break;
+    case 47: loopFor(3000,350,()=>burst({particleCount:50,spread:360,startVelocity:45,origin:{x:rng(0.55,0.95),y:rng(0.1,0.5)},gravity:1.2,ticks:80})); break;
+    case 48: loopFor(3000,400,()=>{const y=rng(0.1,0.4); burst({particleCount:30,spread:360,startVelocity:45,origin:{x:0.3,y},gravity:1.2,ticks:80}); burst({particleCount:30,spread:360,startVelocity:45,origin:{x:0.7,y},gravity:1.2,ticks:80});}); break;
+    case 49: { let enc=40; loopFor(5000,200,()=>{enc+=4; if(Math.random()>0.4)burst({particleCount:Math.min(enc,80),spread:360,startVelocity:rng(35,55),origin:{x:rng(0.05,0.95),y:rng(0.05,0.5)},gravity:1.2,ticks:80});}); } break;
+    case 50: loopFor(4000,200,()=>burst({particleCount:40,spread:360,startVelocity:45,origin:{x:rng(0.05,0.95),y:rng(0.05,0.5)},gravity:1.2,ticks:80})); break;
+    case 51: loopFor(6000,150,()=>burst({particleCount:20,spread:360,startVelocity:rng(35,55),origin:{x:rng(0.05,0.95),y:rng(0.05,0.5)},gravity:1.2,ticks:80})); break;
+    case 52: { let p=15; loopFor(5000,200,()=>{p=Math.min(p+2,80); if(Math.random()>0.3)burst({particleCount:p,spread:360,startVelocity:rng(35,55),origin:{x:rng(0.1,0.9),y:rng(0.1,0.5)},gravity:1.2,ticks:80});}); } break;
+    case 53: burst({particleCount:70,spread:360,startVelocity:50,origin:{x:0.2,y:0.3},gravity:1.2}); delay(400).then(()=>burst({particleCount:70,spread:360,startVelocity:50,origin:{x:0.5,y:0.2},gravity:1.2})); delay(800).then(()=>burst({particleCount:70,spread:360,startVelocity:50,origin:{x:0.8,y:0.35},gravity:1.2})); break;
+    case 54: { let t=0; loopFor(8000,200,()=>{t++; const p=15+t*2; if(Math.random()>0.2)burst({particleCount:Math.min(p,70),spread:360,startVelocity:rng(35,55),origin:{x:rng(0.05,0.95),y:rng(0.05,0.5)},gravity:1.2,ticks:80});}); } break;
+
+    // FLOAT 55-64 (gentle, airy — just a tad more visible)
+    case 55: loopFor(6000,100,()=>burst({particleCount:3,spread:360,startVelocity:5,gravity:0.12,ticks:400,origin:{x:Math.random(),y:-0.1},drift:rng(-0.6,0.6),decay:0.995})); break;
+    case 56: loopFor(5000,90,()=>burst({particleCount:3,spread:360,startVelocity:8,gravity:0.15,ticks:400,origin:{x:Math.random(),y:-0.1},drift:rng(-0.4,0.4),decay:0.99})); break;
+    case 57: loopFor(4000,90,()=>burst({particleCount:3,spread:180,startVelocity:15,gravity:-0.15,ticks:400,origin:{x:rng(0.1,0.9),y:1.1}})); break;
+    case 58: loopFor(5000,120,()=>{if(Math.random()>0.2)burst({particleCount:3,spread:360,startVelocity:2,gravity:0.02,ticks:400,origin:{x:Math.random(),y:Math.random()},decay:0.999});}); break;
+    case 59: loopFor(4000,80,()=>burst({particleCount:2,spread:360,startVelocity:20,gravity:-0.35,ticks:300,origin:{x:rng(0.1,0.9),y:1},drift:rng(-0.4,0.4)})); break;
+    case 60: loopFor(5000,100,()=>burst({particleCount:2,spread:360,startVelocity:rng(4,10),gravity:0,ticks:300,origin:{x:Math.random(),y:Math.random()},drift:rng(-1.5,1.5),decay:0.98})); break;
+    case 61: loopFor(4000,70,()=>burst({particleCount:3,spread:120,startVelocity:18,gravity:-0.2,ticks:350,origin:{x:rng(0.1,0.9),y:1},drift:rng(-0.5,0.5)})); break;
+    case 62: loopFor(5500,120,()=>{if(Math.random()>0.4)burst({particleCount:2,spread:80,startVelocity:8,gravity:0.05,ticks:400,origin:{x:-0.1,y:rng(0.1,0.9)},angle:0,decay:0.999});}); break;
+    case 63: loopFor(4000,100,()=>burst({particleCount:3,spread:360,startVelocity:4,gravity:0.04,ticks:160,origin:{x:Math.random(),y:Math.random()}})); break;
+    case 64: loopFor(8000,200,()=>{if(Math.random()>0.5)burst({particleCount:2,spread:360,startVelocity:4,gravity:0.03,ticks:400,origin:{x:Math.random(),y:Math.random()},decay:0.999});}); break;
+
+    // SPIRAL 65-72 (traced path, not a flood)
+    case 65: { let a=0; loopFor(3000,60,()=>{a+=15; const rad=a*Math.PI/180; const r=a/360*0.45; burst({particleCount:4,spread:30,startVelocity:20,origin:{x:0.5+Math.cos(rad)*r,y:0.5+Math.sin(rad)*r},ticks:70,gravity:0.3}); }); } break;
+    case 66: { let a=0; loopFor(3000,60,()=>{a-=15; const rad=a*Math.PI/180; const r=Math.abs(a)/360*0.45; burst({particleCount:4,spread:30,startVelocity:20,origin:{x:0.5+Math.cos(rad)*r,y:0.5+Math.sin(rad)*r},ticks:70,gravity:0.3}); }); } break;
+    case 67: { let a=0; loopFor(3000,60,()=>{a+=15; const r1=a*Math.PI/180; const r2=(a+180)*Math.PI/180; const d=a/360*0.45; burst({particleCount:3,spread:20,startVelocity:18,origin:{x:0.5+Math.cos(r1)*d,y:0.5+Math.sin(r1)*d},ticks:70}); burst({particleCount:3,spread:20,startVelocity:18,origin:{x:0.5+Math.cos(r2)*d,y:0.5+Math.sin(r2)*d},ticks:70}); }); } break;
+    case 68: { let a=0; loopFor(3000,50,()=>{a+=20; const rad=a*Math.PI/180; burst({particleCount:4,spread:40,startVelocity:30,angle:a%360,origin:{x:0.5+Math.cos(rad)*0.15,y:0.5+Math.sin(rad)*0.15},ticks:80,gravity:0.6}); }); } break;
+    case 69: { let a=0; loopFor(4000,80,()=>{a+=8; const rad=a*Math.PI/180; const r=a/360*0.45; burst({particleCount:3,spread:40,startVelocity:12,origin:{x:0.5+Math.cos(rad)*r,y:0.5+Math.sin(rad)*r},ticks:120,gravity:0.2,decay:0.97}); }); } break;
+    case 70: { let a=0; loopFor(3000,60,()=>{a+=15; const rad=a*Math.PI/180; const r=0.4-a/1500*0.35; burst({particleCount:4,spread:30,startVelocity:18,origin:{x:0.5+Math.cos(rad)*Math.max(r,0.05),y:0.5+Math.sin(rad)*Math.max(r,0.05)},ticks:70}); }); } break;
+    case 71: { let a=0; loopFor(2500,50,()=>{a+=25; const rad=a*Math.PI/180; const r=0.12; burst({particleCount:5,spread:25,startVelocity:25,origin:{x:0.5+Math.cos(rad)*r,y:0.5+Math.sin(rad)*r},ticks:70,gravity:0.4}); }); } break;
+    case 72: { let a=0; loopFor(4000,50,()=>{a+=10; const rad=a*Math.PI/180; burst({particleCount:3,spread:25,startVelocity:15,origin:{x:0.5+Math.cos(rad)*0.3,y:0.5+Math.sin(rad)*0.3},ticks:70,gravity:0.1}); }); } break;
+
+    // WAVE 73-80 (sweeping, visible but not overwhelming)
+    case 73: { let x=0; loopFor(2000,50,()=>{x+=0.025; if(x<=1)burst({particleCount:8,spread:120,startVelocity:40,origin:{x,y:0.5},ticks:80,angle:90}); }); } break;
+    case 74: { let x=1; loopFor(2000,50,()=>{x-=0.025; if(x>=0)burst({particleCount:8,spread:120,startVelocity:40,origin:{x,y:0.5},ticks:80,angle:90}); }); } break;
+    case 75: { let r=0; loopFor(2000,80,()=>{r+=0.08; for(let a=0;a<360;a+=60){const rad=a*Math.PI/180; burst({particleCount:3,spread:20,startVelocity:15,origin:{x:0.5+Math.cos(rad)*r,y:0.5+Math.sin(rad)*r},ticks:70});} }); } break;
+    case 76: { let r=0; loopFor(2500,80,()=>{r+=0.06; for(let a=0;a<360;a+=90){const rad=a*Math.PI/180; burst({particleCount:3,spread:20,startVelocity:15,origin:{x:0.35+Math.cos(rad)*r,y:0.5+Math.sin(rad)*r},ticks:70}); burst({particleCount:3,spread:20,startVelocity:15,origin:{x:0.65+Math.cos(rad)*r,y:0.5+Math.sin(rad)*r},ticks:70});} }); } break;
+    case 77: { let x=0; loopFor(2000,40,()=>{x+=0.02; burst({particleCount:10,spread:240,startVelocity:45,origin:{x,y:0.5},ticks:80,angle:90}); }); } break;
+    case 78: { let t=0; loopFor(3000,50,()=>{t+=0.05; const x=t/3; const y=0.5+Math.sin(t*5)*0.2; if(x<=1)burst({particleCount:5,spread:80,startVelocity:35,origin:{x,y},ticks:80}); }); } break;
+    case 79: { let x=0; loopFor(2000,30,()=>{x+=0.015; burst({particleCount:12,spread:200,startVelocity:50,origin:{x:Math.min(x,1),y:0.5},ticks:100,angle:90}); }); } break;
+    case 80: { let x=0; loopFor(2500,25,()=>{x+=0.01; burst({particleCount:15,spread:240,startVelocity:55,origin:{x:Math.min(x,1),y:0.5},ticks:100,angle:90}); }); } break;
+
+    // FOUNTAIN 81-88 (shoots high, spaced out streams)
+    case 81: loopFor(3000,80,()=>burst({particleCount:8,spread:80,startVelocity:75,origin:{x:0.5,y:1},angle:90,gravity:1.8,ticks:100})); break;
+    case 82: loopFor(3000,80,()=>{burst({particleCount:5,spread:70,startVelocity:75,origin:{x:0.35,y:1},angle:90,gravity:1.8,ticks:100}); burst({particleCount:5,spread:70,startVelocity:75,origin:{x:0.65,y:1},angle:90,gravity:1.8,ticks:100});}); break;
+    case 83: loopFor(1800,50,()=>burst({particleCount:15,spread:40,startVelocity:90,origin:{x:0.5,y:1},angle:90,gravity:2.2,ticks:80})); break;
+    case 84: loopFor(4000,60,()=>burst({particleCount:5,spread:100,startVelocity:rng(30,45),origin:{x:0.5,y:0.55},angle:rng(0,360),gravity:0.4,ticks:60})); break;
+    case 85: for(let i=0;i<8;i++){delay(i*250).then(()=>burst({particleCount:40,spread:60,startVelocity:80+i*4,origin:{x:0.5,y:1},angle:90,gravity:1.8,ticks:100}));} break;
+    case 86: loopFor(3000,80,()=>{burst({particleCount:4,spread:60,startVelocity:75,origin:{x:0.25,y:1},angle:90,gravity:1.8,ticks:100}); burst({particleCount:4,spread:60,startVelocity:75,origin:{x:0.5,y:1},angle:90,gravity:1.8,ticks:100}); burst({particleCount:4,spread:60,startVelocity:75,origin:{x:0.75,y:1},angle:90,gravity:1.8,ticks:100});}); break;
+    case 87: loopFor(1600,40,()=>burst({particleCount:20,spread:50,startVelocity:95,origin:{x:0.5,y:1},angle:90,gravity:2.3,ticks:80})); break;
+    case 88: loopFor(5000,70,()=>burst({particleCount:6,spread:100,startVelocity:rng(50,70),origin:{x:0.5,y:1},angle:90,gravity:1.5,ticks:100})); break;
+
+    // CASCADE 89-100 (dramatic but breathable)
+    case 89: { let y=0; loopFor(3500,50,()=>{y+=0.015; for(let h=0;h<3;h++){burst({particleCount:5,spread:80,startVelocity:30,origin:{x:0.2+h*0.3+rng(0,0.15),y:0.2+h*0.25},angle:315,gravity:0.8,ticks:80});} }); } break;
+    case 90: for(let i=0;i<8;i++){delay(i*250).then(()=>burst({particleCount:40,spread:140,origin:{x:0.1+i*0.1,y:0.2+i*0.08},startVelocity:40,gravity:1,ticks:80}));} break;
+    case 91: for(let i=0;i<10;i++){delay(i*200).then(()=>burst({particleCount:30,spread:200,origin:{x:0.05+i*0.1,y:rng(0.2,0.6)},startVelocity:45,angle:315,gravity:1.2,ticks:80}));} break;
+    case 92: { let p=15; for(let i=0;i<10;i++){delay(i*250).then(()=>{p+=8; burst({particleCount:p,spread:rng(100,180),origin:{x:rng(0.1,0.9),y:0.1+i*0.07},startVelocity:35,gravity:1.2,ticks:80});});} } break;
+    case 93: for(let i=0;i<10;i++){delay(i*300).then(()=>burst({particleCount:20+i*5,spread:360,origin:{x:rng(0.1,0.9),y:rng(0.2,0.6)},startVelocity:rng(35,55),gravity:1.2,ticks:80}));} break;
+    case 94: for(let i=0;i<10;i++){delay(i*150).then(()=>burst({particleCount:30,spread:360,origin:{x:0.05+i*0.1,y:rng(0.3,0.7)},startVelocity:45,gravity:1.2,ticks:80}));} break;
+    case 95:
+      // Standing Ovation: cannons + fireworks + rain
+      burst({particleCount:80,spread:140,angle:60,origin:{x:0,y:0.65},startVelocity:70}); burst({particleCount:80,spread:140,angle:120,origin:{x:1,y:0.65},startVelocity:70});
+      delay(500).then(()=>loopFor(3000,350,()=>burst({particleCount:40,spread:360,startVelocity:50,origin:{x:rng(0.1,0.9),y:rng(0.1,0.5)},gravity:1.2,ticks:80})));
+      delay(2000).then(()=>loopFor(3000,80,()=>burst({particleCount:2,spread:360,startVelocity:20,gravity:0.6,ticks:120,origin:{x:Math.random(),y:-0.1}})));
+      break;
+    case 96:
+      // Victory Lap: spiral into burst into rain
+      { let a=0; loopFor(2000,60,()=>{a+=15; const rad=a*Math.PI/180; const r=a/360*0.45; burst({particleCount:4,spread:30,startVelocity:20,origin:{x:0.5+Math.cos(rad)*r,y:0.5+Math.sin(rad)*r},ticks:70,gravity:0.3}); }); }
+      delay(2000).then(()=>burst({particleCount:150,spread:360,startVelocity:60,origin:{x:0.5,y:0.5}}));
+      delay(2500).then(()=>loopFor(3000,80,()=>burst({particleCount:2,spread:360,startVelocity:20,gravity:0.6,ticks:120,origin:{x:Math.random(),y:-0.1}})));
+      break;
+    case 97:
+      // Red Carpet: dual cannons into cascade into burst
+      burst({particleCount:80,spread:140,angle:60,origin:{x:0,y:0.65},startVelocity:75}); burst({particleCount:80,spread:140,angle:120,origin:{x:1,y:0.65},startVelocity:75});
+      delay(800).then(()=>{for(let i=0;i<8;i++){delay(i*200).then(()=>burst({particleCount:30,spread:360,origin:{x:0.05+i*0.12,y:0.5},startVelocity:40,gravity:1.2,ticks:80}));}});
+      delay(2500).then(()=>burst({particleCount:150,spread:220,origin:{y:0.5},startVelocity:60}));
+      break;
+    case 98:
+      // Supernova: starts tiny, builds to big
+      burst({particleCount:8,spread:40,origin:{x:0.5,y:0.5},startVelocity:15});
+      delay(300).then(()=>burst({particleCount:20,spread:100,origin:{x:0.5,y:0.5},startVelocity:30}));
+      delay(600).then(()=>burst({particleCount:50,spread:180,origin:{x:0.5,y:0.5},startVelocity:45}));
+      delay(900).then(()=>burst({particleCount:90,spread:280,origin:{x:0.5,y:0.5},startVelocity:55}));
+      delay(1200).then(()=>burst({particleCount:150,spread:360,origin:{x:0.5,y:0.5},startVelocity:65}));
+      break;
+    case 99:
+      // Curtain Call: minimal, elegant sweep top to bottom
+      { let row=0; loopFor(3000,60,()=>{row+=0.025; for(let x=0;x<=1;x+=0.15){burst({particleCount:2,spread:60,startVelocity:20,origin:{x:x+rng(0,0.15),y:Math.min(row,1)},gravity:0.8,ticks:70});} }); }
+      break;
+    case 100:
+      // Grand Celebration: EVERYTHING
+      burst({particleCount:150,spread:240,origin:{y:0.6},startVelocity:60});
+      delay(300).then(()=>{burst({particleCount:80,spread:140,angle:60,origin:{x:0,y:0.65},startVelocity:75}); burst({particleCount:80,spread:140,angle:120,origin:{x:1,y:0.65},startVelocity:75});});
+      delay(600).then(()=>loopFor(2500,150,()=>burst({particleCount:20,spread:360,startVelocity:rng(40,60),origin:{x:rng(0.05,0.95),y:rng(0.05,0.5)},gravity:1.2,ticks:80})));
+      delay(2600).then(()=>loopFor(3000,80,()=>burst({particleCount:2,spread:360,startVelocity:20,gravity:0.5,ticks:120,origin:{x:Math.random(),y:-0.1}})));
+      delay(5600).then(()=>{for(let i=0;i<6;i++){delay(i*150).then(()=>burst({particleCount:80,spread:360,origin:{x:rng(0.1,0.9),y:rng(0.1,0.5)},startVelocity:60,gravity:1.2,ticks:80}));}});
+      break;
+
+    default: burst({ particleCount:80, spread:160, origin:{y:0.6}, startVelocity:50 });
+  }
+}
+
+// =============================================
+// WELCOME BURST (Saint Ivy colors + martini, hidden)
+// =============================================
+function welcomeBurst() {
+  const wc = welcomeColors;
+  const martini = confetti.shapeFromText({ text: '🍸', scalar: 3 });
+
+  // Curtain Call style: full-width cascade top to bottom with Saint Ivy colors
+  let row = 0;
+  const end = Date.now() + 3000;
+  const timer = setInterval(() => {
+    if (Date.now() > end) return clearInterval(timer);
+    row += 0.02;
+    for (let x = 0; x <= 1; x += 0.1) {
+      confetti({
+        particleCount: 3,
+        spread: 80,
+        startVelocity: 25,
+        origin: { x: x + Math.random() * 0.1, y: Math.min(row, 1) },
+        gravity: 0.8,
+        ticks: 80,
+        colors: wc,
+        shapes: ['circle'],
+        scalar: 1.6
+      });
+      // Occasional martini
+      if (Math.random() > 0.93) {
+        confetti({
+          particleCount: 1,
+          spread: 80,
+          startVelocity: 25,
+          origin: { x: x + Math.random() * 0.1, y: Math.min(row, 1) },
+          gravity: 0.8,
+          ticks: 80,
+          shapes: [martini],
+          scalar: 3,
+          colors: wc
+        });
+      }
+    }
+  }, 50);
+}
+
+// =============================================
+// INIT
+// =============================================
+buildCustomShapes();
+renderColorSlots();
+renderPresets();
+renderShapeGrid();
+renderCategories();
+renderEffects();
+setupEmojiMixer();
+
+// Welcome burst disabled
+</script>
+</body>
+</html>
