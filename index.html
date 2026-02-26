@@ -803,6 +803,7 @@
   <div>
     <button class="clear-btn" onclick="clearSelectedEffects()">Clear</button>
     <button class="play-btn" onclick="playSelectedEffects()">Play All</button>
+    <button class="play-btn" id="copyAllBtn" onclick="copyAllCode()">Copy Code</button>
   </div>
 </div>
 
@@ -2083,20 +2084,183 @@ function renderEffects() {
 }
 
 // =============================================
-// COPY CODE
+// COPY CODE — pure JS output for Showit/website JS boxes
 // =============================================
+
+// Map of effect case bodies as code strings
+function getEffectCode(id) {
+  const map = {
+    1: 'burst({particleCount:80,spread:160,origin:{y:0.6},startVelocity:50});',
+    2: 'burst({particleCount:60,spread:140,origin:{y:0.6},startVelocity:45}); delay(300).then(()=>burst({particleCount:70,spread:140,origin:{y:0.55},startVelocity:50}));',
+    3: 'burst({particleCount:50,spread:150,origin:{y:0.6},startVelocity:45}); delay(250).then(()=>burst({particleCount:70,spread:160,origin:{y:0.55},startVelocity:50})); delay(500).then(()=>burst({particleCount:100,spread:180,origin:{y:0.5},startVelocity:55}));',
+    4: 'burst({particleCount:80,spread:360,origin:{y:0.5},gravity:0.3,startVelocity:35,ticks:180,decay:0.96});',
+    5: 'burst({particleCount:150,spread:220,origin:{y:0.6},startVelocity:60});',
+    6: 'burst({particleCount:35,spread:100,origin:{y:0.6},gravity:0.6,startVelocity:35});',
+    7: 'burst({particleCount:80,spread:140,origin:{y:0.5},gravity:2,startVelocity:55,ticks:100});',
+    8: 'burst({particleCount:70,spread:200,origin:{y:0.6},gravity:0.15,startVelocity:30,ticks:140,decay:0.97});',
+    9: 'burst({particleCount:50,spread:360,startVelocity:45,origin:{x:0.5,y:0.5}}); delay(200).then(()=>burst({particleCount:70,spread:360,startVelocity:55,origin:{x:0.5,y:0.5}})); delay(400).then(()=>burst({particleCount:100,spread:360,startVelocity:65,origin:{x:0.5,y:0.5}}));',
+    10: 'burst({particleCount:120,spread:240,origin:{y:0.6},startVelocity:50});',
+    11: 'burst({particleCount:120,spread:360,startVelocity:55,origin:{x:0.5,y:0.5}});',
+    12: 'burst({particleCount:100,spread:180,origin:{x:0.5,y:1},startVelocity:65});',
+    13: 'burst({particleCount:100,spread:240,origin:{x:0.5,y:0},startVelocity:45,gravity:0.6});',
+    14: 'burst({particleCount:80,spread:160,origin:{x:0,y:0.5},angle:0,startVelocity:60});',
+    15: 'burst({particleCount:80,spread:160,origin:{x:1,y:0.5},angle:180,startVelocity:60});',
+    16: 'burst({particleCount:40,spread:120,origin:{x:0,y:0},angle:315,startVelocity:50}); burst({particleCount:40,spread:120,origin:{x:1,y:0},angle:225,startVelocity:50}); burst({particleCount:40,spread:120,origin:{x:0,y:1},angle:45,startVelocity:50}); burst({particleCount:40,spread:120,origin:{x:1,y:1},angle:135,startVelocity:50});',
+    17: 'burst({particleCount:60,spread:120,origin:{x:0,y:0},angle:315,startVelocity:55}); burst({particleCount:60,spread:120,origin:{x:1,y:1},angle:135,startVelocity:55});',
+    18: 'burst({particleCount:80,spread:160,origin:{y:0.8},startVelocity:70,gravity:1.5});',
+    19: 'for(var i=0;i<5;i++){delay(i*400).then(()=>burst({particleCount:50,spread:160,origin:{y:0.6},startVelocity:50}));}',
+    20: 'loopFor(4000,50,()=>burst({particleCount:5,spread:180,startVelocity:55,decay:0.94,gravity:2,ticks:300,origin:{x:Math.random(),y:-0.1}}));',
+    21: 'loopFor(3500,40,()=>burst({particleCount:6,spread:200,startVelocity:50,gravity:2.2,ticks:280,origin:{x:Math.random(),y:-0.1}}));',
+    22: 'loopFor(5000,120,()=>{if(Math.random()>0.2)burst({particleCount:2,spread:100,startVelocity:45,gravity:1.8,ticks:350,origin:{x:Math.random(),y:-0.1}});});',
+    23: 'loopFor(4000,50,()=>{burst({particleCount:5,angle:110,spread:60,startVelocity:55,gravity:1.8,ticks:300,origin:{x:rng(0,0.4),y:-0.1}}); burst({particleCount:5,angle:70,spread:60,startVelocity:55,gravity:1.8,ticks:300,origin:{x:rng(0.6,1),y:-0.1}});});',
+    24: 'loopFor(4000,50,()=>burst({particleCount:5,spread:200,startVelocity:50,gravity:2.5,ticks:280,origin:{x:Math.random(),y:-0.1}}));',
+    25: 'loopFor(3500,50,()=>burst({particleCount:5,spread:220,startVelocity:48,gravity:2,ticks:300,origin:{x:Math.random(),y:-0.1}}));',
+    26: 'loopFor(4000,35,()=>burst({particleCount:6,spread:360,startVelocity:45,gravity:1.5,ticks:350,origin:{x:Math.random(),y:-0.1},drift:rng(-2.5,2.5)}));',
+    27: 'loopFor(3500,30,()=>burst({particleCount:7,spread:360,startVelocity:55,gravity:2,ticks:280,origin:{x:Math.random(),y:-0.1},drift:rng(-1,1)}));',
+    28: 'loopFor(4000,60,()=>burst({particleCount:4,spread:200,startVelocity:50,gravity:2,ticks:320,origin:{x:Math.random(),y:-0.1},drift:rng(-0.5,0.5)}));',
+    29: 'loopFor(4000,45,()=>burst({particleCount:5,spread:240,startVelocity:48,gravity:1.8,ticks:300,origin:{x:Math.random(),y:-0.1},drift:rng(-1,1)}));',
+    30: 'burst({particleCount:70,spread:140,angle:60,origin:{x:0,y:0.65},startVelocity:70});',
+    31: 'burst({particleCount:70,spread:140,angle:120,origin:{x:1,y:0.65},startVelocity:70});',
+    32: 'burst({particleCount:50,spread:140,angle:60,origin:{x:0,y:0.65},startVelocity:70}); burst({particleCount:50,spread:140,angle:120,origin:{x:1,y:0.65},startVelocity:70});',
+    33: 'burst({particleCount:50,spread:120,angle:60,origin:{x:0,y:0.65},startVelocity:65}); delay(400).then(()=>burst({particleCount:50,spread:120,angle:120,origin:{x:1,y:0.65},startVelocity:65})); delay(800).then(()=>burst({particleCount:50,spread:120,angle:60,origin:{x:0,y:0.65},startVelocity:65})); delay(1200).then(()=>burst({particleCount:50,spread:120,angle:120,origin:{x:1,y:0.65},startVelocity:65}));',
+    34: 'burst({particleCount:80,spread:180,angle:90,origin:{x:0.5,y:1},startVelocity:85,gravity:2});',
+    35: 'burst({particleCount:70,spread:120,angle:60,origin:{x:0,y:0.7},startVelocity:75});',
+    36: 'burst({particleCount:60,spread:180,angle:90,origin:{x:0.5,y:0.85},startVelocity:65});',
+    37: 'for(var i=0;i<3;i++){delay(i*200).then(()=>burst({particleCount:40,spread:120,angle:60,origin:{x:0,y:0.65},startVelocity:65}));}',
+    38: 'for(var i=0;i<3;i++){delay(i*200).then(()=>burst({particleCount:40,spread:120,angle:120,origin:{x:1,y:0.65},startVelocity:65}));}',
+    39: 'loopFor(5000,200,()=>{burst({particleCount:15,spread:120,angle:60,origin:{x:0,y:0.65},startVelocity:rng(55,75)}); burst({particleCount:15,spread:120,angle:120,origin:{x:1,y:0.65},startVelocity:rng(55,75)});});',
+    40: 'burst({particleCount:60,spread:360,startVelocity:50,origin:{x:rng(0.2,0.8),y:rng(0.1,0.4)},gravity:1.2});',
+    41: 'loopFor(3000,400,()=>burst({particleCount:50,spread:360,startVelocity:45,origin:{x:rng(0.1,0.9),y:rng(0.1,0.5)},gravity:1.2,ticks:80}));',
+    42: 'loopFor(3000,150,()=>burst({particleCount:25,spread:360,startVelocity:rng(40,60),origin:{x:rng(0.05,0.95),y:rng(0.05,0.5)},gravity:1.2,ticks:80}));',
+    43: 'loopFor(5000,600,()=>burst({particleCount:60,spread:360,startVelocity:40,origin:{x:rng(0.2,0.8),y:rng(0.1,0.4)},gravity:0.8,ticks:120,decay:0.95}));',
+    44: 'loopFor(3000,400,()=>burst({particleCount:50,spread:360,startVelocity:40,origin:{x:rng(0.1,0.9),y:rng(0.5,0.8)},gravity:1.1,ticks:80}));',
+    45: 'loopFor(3000,400,()=>burst({particleCount:50,spread:360,startVelocity:40,origin:{x:rng(0.1,0.9),y:rng(0.05,0.3)},gravity:1,ticks:100}));',
+    46: 'loopFor(3000,350,()=>burst({particleCount:50,spread:360,startVelocity:45,origin:{x:rng(0.05,0.45),y:rng(0.1,0.5)},gravity:1.2,ticks:80}));',
+    47: 'loopFor(3000,350,()=>burst({particleCount:50,spread:360,startVelocity:45,origin:{x:rng(0.55,0.95),y:rng(0.1,0.5)},gravity:1.2,ticks:80}));',
+    48: 'loopFor(3000,400,()=>{var y=rng(0.1,0.4); burst({particleCount:30,spread:360,startVelocity:45,origin:{x:0.3,y:y},gravity:1.2,ticks:80}); burst({particleCount:30,spread:360,startVelocity:45,origin:{x:0.7,y:y},gravity:1.2,ticks:80});});',
+    49: 'var enc=40; loopFor(5000,200,()=>{enc+=4; if(Math.random()>0.4)burst({particleCount:Math.min(enc,80),spread:360,startVelocity:rng(35,55),origin:{x:rng(0.05,0.95),y:rng(0.05,0.5)},gravity:1.2,ticks:80});});',
+    50: 'loopFor(4000,200,()=>burst({particleCount:40,spread:360,startVelocity:45,origin:{x:rng(0.05,0.95),y:rng(0.05,0.5)},gravity:1.2,ticks:80}));',
+    51: 'loopFor(6000,150,()=>burst({particleCount:20,spread:360,startVelocity:rng(35,55),origin:{x:rng(0.05,0.95),y:rng(0.05,0.5)},gravity:1.2,ticks:80}));',
+    52: 'var p=15; loopFor(5000,200,()=>{p=Math.min(p+2,80); if(Math.random()>0.3)burst({particleCount:p,spread:360,startVelocity:rng(35,55),origin:{x:rng(0.1,0.9),y:rng(0.1,0.5)},gravity:1.2,ticks:80});});',
+    53: 'burst({particleCount:70,spread:360,startVelocity:50,origin:{x:0.2,y:0.3},gravity:1.2}); delay(400).then(()=>burst({particleCount:70,spread:360,startVelocity:50,origin:{x:0.5,y:0.2},gravity:1.2})); delay(800).then(()=>burst({particleCount:70,spread:360,startVelocity:50,origin:{x:0.8,y:0.35},gravity:1.2}));',
+    54: 'var t=0; loopFor(8000,200,()=>{t++; var p=15+t*2; if(Math.random()>0.2)burst({particleCount:Math.min(p,70),spread:360,startVelocity:rng(35,55),origin:{x:rng(0.05,0.95),y:rng(0.05,0.5)},gravity:1.2,ticks:80});});',
+    55: 'loopFor(6000,100,()=>burst({particleCount:3,spread:360,startVelocity:5,gravity:0.12,ticks:400,origin:{x:Math.random(),y:-0.1},drift:rng(-0.6,0.6),decay:0.995}));',
+    56: 'loopFor(5000,90,()=>burst({particleCount:3,spread:360,startVelocity:8,gravity:0.15,ticks:400,origin:{x:Math.random(),y:-0.1},drift:rng(-0.4,0.4),decay:0.99}));',
+    57: 'loopFor(4000,90,()=>burst({particleCount:3,spread:180,startVelocity:15,gravity:-0.15,ticks:400,origin:{x:rng(0.1,0.9),y:1.1}}));',
+    58: 'loopFor(5000,120,()=>{if(Math.random()>0.2)burst({particleCount:3,spread:360,startVelocity:2,gravity:0.02,ticks:400,origin:{x:Math.random(),y:Math.random()},decay:0.999});});',
+    59: 'loopFor(4000,80,()=>burst({particleCount:2,spread:360,startVelocity:20,gravity:-0.35,ticks:300,origin:{x:rng(0.1,0.9),y:1},drift:rng(-0.4,0.4)}));',
+    60: 'loopFor(5000,100,()=>burst({particleCount:2,spread:360,startVelocity:rng(4,10),gravity:0,ticks:300,origin:{x:Math.random(),y:Math.random()},drift:rng(-1.5,1.5),decay:0.98}));',
+    61: 'loopFor(4000,70,()=>burst({particleCount:3,spread:120,startVelocity:18,gravity:-0.2,ticks:350,origin:{x:rng(0.1,0.9),y:1},drift:rng(-0.5,0.5)}));',
+    62: 'loopFor(5500,120,()=>{if(Math.random()>0.4)burst({particleCount:2,spread:80,startVelocity:8,gravity:0.05,ticks:400,origin:{x:-0.1,y:rng(0.1,0.9)},angle:0,decay:0.999});});',
+    63: 'loopFor(4000,100,()=>burst({particleCount:3,spread:360,startVelocity:4,gravity:0.04,ticks:160,origin:{x:Math.random(),y:Math.random()}}));',
+    64: 'loopFor(8000,200,()=>{if(Math.random()>0.5)burst({particleCount:2,spread:360,startVelocity:4,gravity:0.03,ticks:400,origin:{x:Math.random(),y:Math.random()},decay:0.999});});',
+    65: 'var a=0; loopFor(3000,60,()=>{a+=15; var rad=a*Math.PI/180; var r=a/360*0.45; burst({particleCount:4,spread:30,startVelocity:20,origin:{x:0.5+Math.cos(rad)*r,y:0.5+Math.sin(rad)*r},ticks:70,gravity:0.3});});',
+    66: 'var a=0; loopFor(3000,60,()=>{a-=15; var rad=a*Math.PI/180; var r=Math.abs(a)/360*0.45; burst({particleCount:4,spread:30,startVelocity:20,origin:{x:0.5+Math.cos(rad)*r,y:0.5+Math.sin(rad)*r},ticks:70,gravity:0.3});});',
+    67: 'var a=0; loopFor(3000,60,()=>{a+=15; var r1=a*Math.PI/180; var r2=(a+180)*Math.PI/180; var d=a/360*0.45; burst({particleCount:3,spread:20,startVelocity:18,origin:{x:0.5+Math.cos(r1)*d,y:0.5+Math.sin(r1)*d},ticks:70}); burst({particleCount:3,spread:20,startVelocity:18,origin:{x:0.5+Math.cos(r2)*d,y:0.5+Math.sin(r2)*d},ticks:70});});',
+    68: 'var a=0; loopFor(3000,50,()=>{a+=20; var rad=a*Math.PI/180; burst({particleCount:4,spread:40,startVelocity:30,angle:a%360,origin:{x:0.5+Math.cos(rad)*0.15,y:0.5+Math.sin(rad)*0.15},ticks:80,gravity:0.6});});',
+    69: 'var a=0; loopFor(4000,80,()=>{a+=8; var rad=a*Math.PI/180; var r=a/360*0.45; burst({particleCount:3,spread:40,startVelocity:12,origin:{x:0.5+Math.cos(rad)*r,y:0.5+Math.sin(rad)*r},ticks:120,gravity:0.2,decay:0.97});});',
+    70: 'var a=0; loopFor(3000,60,()=>{a+=15; var rad=a*Math.PI/180; var r=0.4-a/1500*0.35; burst({particleCount:4,spread:30,startVelocity:18,origin:{x:0.5+Math.cos(rad)*Math.max(r,0.05),y:0.5+Math.sin(rad)*Math.max(r,0.05)},ticks:70});});',
+    71: 'var a=0; loopFor(2500,50,()=>{a+=25; var rad=a*Math.PI/180; var r=0.12; burst({particleCount:5,spread:25,startVelocity:25,origin:{x:0.5+Math.cos(rad)*r,y:0.5+Math.sin(rad)*r},ticks:70,gravity:0.4});});',
+    72: 'var a=0; loopFor(4000,50,()=>{a+=10; var rad=a*Math.PI/180; burst({particleCount:3,spread:25,startVelocity:15,origin:{x:0.5+Math.cos(rad)*0.3,y:0.5+Math.sin(rad)*0.3},ticks:70,gravity:0.1});});',
+    73: 'var x=0; loopFor(2000,50,()=>{x+=0.025; if(x<=1)burst({particleCount:8,spread:120,startVelocity:40,origin:{x:x,y:0.5},ticks:80,angle:90});});',
+    74: 'var x=1; loopFor(2000,50,()=>{x-=0.025; if(x>=0)burst({particleCount:8,spread:120,startVelocity:40,origin:{x:x,y:0.5},ticks:80,angle:90});});',
+    75: 'var r=0; loopFor(2000,80,()=>{r+=0.08; for(var a=0;a<360;a+=60){var rad=a*Math.PI/180; burst({particleCount:3,spread:20,startVelocity:15,origin:{x:0.5+Math.cos(rad)*r,y:0.5+Math.sin(rad)*r},ticks:70});}});',
+    76: 'var r=0; loopFor(2500,80,()=>{r+=0.06; for(var a=0;a<360;a+=90){var rad=a*Math.PI/180; burst({particleCount:3,spread:20,startVelocity:15,origin:{x:0.35+Math.cos(rad)*r,y:0.5+Math.sin(rad)*r},ticks:70}); burst({particleCount:3,spread:20,startVelocity:15,origin:{x:0.65+Math.cos(rad)*r,y:0.5+Math.sin(rad)*r},ticks:70});}});',
+    77: 'var x=0; loopFor(2000,40,()=>{x+=0.02; burst({particleCount:10,spread:240,startVelocity:45,origin:{x:x,y:0.5},ticks:80,angle:90});});',
+    78: 'var t=0; loopFor(3000,50,()=>{t+=0.05; var x=t/3; var y=0.5+Math.sin(t*5)*0.2; if(x<=1)burst({particleCount:5,spread:80,startVelocity:35,origin:{x:x,y:y},ticks:80});});',
+    79: 'var x=0; loopFor(2000,30,()=>{x+=0.015; burst({particleCount:12,spread:200,startVelocity:50,origin:{x:Math.min(x,1),y:0.5},ticks:100,angle:90});});',
+    80: 'var x=0; loopFor(2500,25,()=>{x+=0.01; burst({particleCount:15,spread:240,startVelocity:55,origin:{x:Math.min(x,1),y:0.5},ticks:100,angle:90});});',
+    81: 'loopFor(3000,80,()=>burst({particleCount:8,spread:80,startVelocity:75,origin:{x:0.5,y:1},angle:90,gravity:1.8,ticks:100}));',
+    82: 'loopFor(3000,80,()=>{burst({particleCount:5,spread:70,startVelocity:75,origin:{x:0.35,y:1},angle:90,gravity:1.8,ticks:100}); burst({particleCount:5,spread:70,startVelocity:75,origin:{x:0.65,y:1},angle:90,gravity:1.8,ticks:100});});',
+    83: 'loopFor(1800,50,()=>burst({particleCount:15,spread:40,startVelocity:90,origin:{x:0.5,y:1},angle:90,gravity:2.2,ticks:80}));',
+    84: 'loopFor(4000,60,()=>burst({particleCount:5,spread:100,startVelocity:rng(30,45),origin:{x:0.5,y:0.55},angle:rng(0,360),gravity:0.4,ticks:60}));',
+    85: 'for(var i=0;i<8;i++){delay(i*250).then(()=>burst({particleCount:40,spread:60,startVelocity:80,origin:{x:0.5,y:1},angle:90,gravity:1.8,ticks:100}));}',
+    86: 'loopFor(3000,80,()=>{burst({particleCount:4,spread:60,startVelocity:75,origin:{x:0.25,y:1},angle:90,gravity:1.8,ticks:100}); burst({particleCount:4,spread:60,startVelocity:75,origin:{x:0.5,y:1},angle:90,gravity:1.8,ticks:100}); burst({particleCount:4,spread:60,startVelocity:75,origin:{x:0.75,y:1},angle:90,gravity:1.8,ticks:100});});',
+    87: 'loopFor(1600,40,()=>burst({particleCount:20,spread:50,startVelocity:95,origin:{x:0.5,y:1},angle:90,gravity:2.3,ticks:80}));',
+    88: 'loopFor(5000,70,()=>burst({particleCount:6,spread:100,startVelocity:rng(50,70),origin:{x:0.5,y:1},angle:90,gravity:1.5,ticks:100}));',
+    89: 'var y=0; loopFor(3500,50,()=>{y+=0.015; for(var h=0;h<3;h++){burst({particleCount:5,spread:80,startVelocity:30,origin:{x:0.2+h*0.3+rng(0,0.15),y:0.2+h*0.25},angle:315,gravity:0.8,ticks:80});}});',
+    90: 'for(var i=0;i<8;i++){delay(i*250).then(()=>burst({particleCount:40,spread:140,origin:{x:0.1+Math.random()*0.8,y:0.2+Math.random()*0.5},startVelocity:40,gravity:1,ticks:80}));}',
+    91: 'for(var i=0;i<10;i++){delay(i*200).then(()=>burst({particleCount:30,spread:200,origin:{x:0.05+Math.random()*0.9,y:rng(0.2,0.6)},startVelocity:45,angle:315,gravity:1.2,ticks:80}));}',
+    92: 'var p=15; for(var i=0;i<10;i++){delay(i*250).then(()=>{p+=8; burst({particleCount:p,spread:rng(100,180),origin:{x:rng(0.1,0.9),y:0.1+Math.random()*0.6},startVelocity:35,gravity:1.2,ticks:80});});}',
+    93: 'for(var i=0;i<10;i++){delay(i*300).then(()=>burst({particleCount:20+Math.floor(Math.random()*30),spread:360,origin:{x:rng(0.1,0.9),y:rng(0.2,0.6)},startVelocity:rng(35,55),gravity:1.2,ticks:80}));}',
+    94: 'for(var i=0;i<10;i++){delay(i*150).then(()=>burst({particleCount:30,spread:360,origin:{x:0.05+Math.random()*0.9,y:rng(0.3,0.7)},startVelocity:45,gravity:1.2,ticks:80}));}',
+    95: 'burst({particleCount:80,spread:140,angle:60,origin:{x:0,y:0.65},startVelocity:70}); burst({particleCount:80,spread:140,angle:120,origin:{x:1,y:0.65},startVelocity:70}); delay(500).then(()=>loopFor(3000,350,()=>burst({particleCount:40,spread:360,startVelocity:50,origin:{x:rng(0.1,0.9),y:rng(0.1,0.5)},gravity:1.2,ticks:80}))); delay(2000).then(()=>loopFor(3000,80,()=>burst({particleCount:2,spread:360,startVelocity:20,gravity:0.6,ticks:120,origin:{x:Math.random(),y:-0.1}})));',
+    96: 'var a=0; loopFor(2000,60,()=>{a+=15; var rad=a*Math.PI/180; var r=a/360*0.45; burst({particleCount:4,spread:30,startVelocity:20,origin:{x:0.5+Math.cos(rad)*r,y:0.5+Math.sin(rad)*r},ticks:70,gravity:0.3});}); delay(2000).then(()=>burst({particleCount:150,spread:360,startVelocity:60,origin:{x:0.5,y:0.5}})); delay(2500).then(()=>loopFor(3000,80,()=>burst({particleCount:2,spread:360,startVelocity:20,gravity:0.6,ticks:120,origin:{x:Math.random(),y:-0.1}})));',
+    97: 'burst({particleCount:80,spread:140,angle:60,origin:{x:0,y:0.65},startVelocity:75}); burst({particleCount:80,spread:140,angle:120,origin:{x:1,y:0.65},startVelocity:75}); delay(800).then(()=>{for(var i=0;i<8;i++){delay(i*200).then(()=>burst({particleCount:30,spread:360,origin:{x:0.05+i*0.12,y:0.5},startVelocity:40,gravity:1.2,ticks:80}));}}); delay(2500).then(()=>burst({particleCount:150,spread:220,origin:{y:0.5},startVelocity:60}));',
+    98: 'burst({particleCount:8,spread:40,origin:{x:0.5,y:0.5},startVelocity:15}); delay(300).then(()=>burst({particleCount:20,spread:100,origin:{x:0.5,y:0.5},startVelocity:30})); delay(600).then(()=>burst({particleCount:50,spread:180,origin:{x:0.5,y:0.5},startVelocity:45})); delay(900).then(()=>burst({particleCount:90,spread:280,origin:{x:0.5,y:0.5},startVelocity:55})); delay(1200).then(()=>burst({particleCount:150,spread:360,origin:{x:0.5,y:0.5},startVelocity:65}));',
+    99: 'var row=0; loopFor(3000,60,()=>{row+=0.025; for(var x=0;x<=1;x+=0.15){burst({particleCount:2,spread:60,startVelocity:20,origin:{x:x+rng(0,0.15),y:Math.min(row,1)},gravity:0.8,ticks:70});}});',
+    100: 'burst({particleCount:150,spread:240,origin:{y:0.6},startVelocity:60}); delay(300).then(()=>{burst({particleCount:80,spread:140,angle:60,origin:{x:0,y:0.65},startVelocity:75}); burst({particleCount:80,spread:140,angle:120,origin:{x:1,y:0.65},startVelocity:75});}); delay(600).then(()=>loopFor(2500,150,()=>burst({particleCount:20,spread:360,startVelocity:rng(40,60),origin:{x:rng(0.05,0.95),y:rng(0.05,0.5)},gravity:1.2,ticks:80}))); delay(2600).then(()=>loopFor(3000,80,()=>burst({particleCount:2,spread:360,startVelocity:20,gravity:0.5,ticks:120,origin:{x:Math.random(),y:-0.1}}))); delay(5600).then(()=>{for(var i=0;i<6;i++){delay(i*150).then(()=>burst({particleCount:80,spread:360,origin:{x:rng(0.1,0.9),y:rng(0.1,0.5)},startVelocity:60,gravity:1.2,ticks:80}));}});'
+  };
+  return map[id] || 'burst({particleCount:80,spread:160,origin:{y:0.6},startVelocity:50});';
+}
+
+function generateSnippet(ids) {
+  // Accept single id or array of ids
+  if (!Array.isArray(ids)) ids = [ids];
+  const activeC = getActiveColors();
+  const effectNames = ids.map(id => {
+    const e = effects.find(ef => ef.id === id);
+    return e ? e.name : 'Effect #' + id;
+  });
+
+  // Gather all effect code strings to check which helpers are needed
+  const allEffectCode = ids.map(id => getEffectCode(id));
+  // Multi-effect always needs delay for staggering
+  const needsDelay = ids.length > 1 || allEffectCode.some(c => c.includes('delay('));
+  const needsRng = allEffectCode.some(c => c.includes('rng('));
+  const needsLoopFor = allEffectCode.some(c => c.includes('loopFor('));
+
+  let code = '// CONFETTI BAR by SAINT IVY\n';
+  code += '// Effects: ' + effectNames.join(' + ') + '\n';
+  code += '(function(){\n';
+  code += '  var s=document.createElement("script");\n';
+  code += '  s.src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js";\n';
+  code += '  s.onload=function(){\n';
+  code += '    var colors=' + JSON.stringify(activeC) + ';\n';
+  code += '    function burst(o){o.colors=o.colors||colors;o.ticks=o.ticks||200;confetti(o);}\n';
+  if (needsDelay) code += '    function delay(ms){return new Promise(function(r){setTimeout(r,ms)});}\n';
+  if (needsRng) code += '    function rng(a,b){return Math.random()*(b-a)+a;}\n';
+  if (needsLoopFor) code += '    function loopFor(d,iv,fn){var e=Date.now()+d;var t=setInterval(function(){if(Date.now()>e){clearInterval(t);return;}fn();},iv);}\n';
+
+  if (ids.length === 1) {
+    code += '    ' + allEffectCode[0] + '\n';
+  } else {
+    ids.forEach((id, i) => {
+      if (i === 0) {
+        code += '    // ' + effectNames[i] + '\n';
+        code += '    ' + allEffectCode[i] + '\n';
+      } else {
+        const delayMs = i * 2000;
+        code += '    // ' + effectNames[i] + ' (starts after ' + (delayMs/1000) + 's)\n';
+        code += '    delay(' + delayMs + ').then(function(){' + allEffectCode[i] + '});\n';
+      }
+    });
+  }
+
+  code += '  };\n';
+  code += '  document.head.appendChild(s);\n';
+  code += '})();';
+  return code;
+}
+
 function copyCode(id) {
   const code = generateSnippet(id);
   navigator.clipboard.writeText(code).then(() => {
     const btn = event.target;
-    btn.textContent = 'Copied';
+    btn.textContent = 'Copied!';
     setTimeout(() => btn.textContent = 'Copy Code', 1500);
   });
 }
 
-function generateSnippet(id) {
-  const activeC = getActiveColors();
-  return `<!-- CONFETTI BAR™ by SAINT IVY - Effect #${id} -->\n<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"><\/script>\n<script>\n(function(){\n  var colors = ${JSON.stringify(activeC)};\n  confetti({ particleCount: 300, spread: 100, colors: colors, origin: { y: 0.6 } });\n})();\n<\/script>`;
+function copyAllCode() {
+  if (selectedEffects.size === 0) return;
+  const ids = [...selectedEffects];
+  const code = generateSnippet(ids);
+  navigator.clipboard.writeText(code).then(() => {
+    const btn = document.getElementById('copyAllBtn');
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy All Code', 1500);
+  });
 }
 
 // =============================================
@@ -2161,7 +2325,7 @@ function triggerEffect(id) {
         fireShapes(customS, c, CUSTOM_SCALAR, opts, pCount);
       }
       if (total === 0) {
-        confetti({ colors: c, ticks: 200, shapes: ['circle'], scalar: NATIVE_SCALAR, ...opts });
+        confetti({ colors: c, ticks: 200, shapes: ['circle'], scalar: 1, ...opts });
       }
     }
 
